@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'piculet/dsl/permissions'
 
 module Piculet

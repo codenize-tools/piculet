@@ -1,3 +1,5 @@
+require 'ostruct'
+
 module Piculet
   class DSL
     class EC2
