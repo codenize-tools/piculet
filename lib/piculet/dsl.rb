@@ -40,7 +40,7 @@ module Piculet
 
       def initialize(vpc, &block)
         @result = OpenStruct.new({
-          :vpc => vpc,
+          :vpc             => vpc,
           :security_groups => [],
         })
 
@@ -57,9 +57,9 @@ module Piculet
           @name = name
 
           @result = OpenStruct.new({
-            :name => name,
+            :name    => name,
             :ingress => [],
-            :egress => [],
+            :egress  => [],
           })
 
           instance_eval(&block)
@@ -74,7 +74,6 @@ module Piculet
         end
 
         private
-
         def description(value)
           @result.description = value
         end
