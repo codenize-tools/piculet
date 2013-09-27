@@ -7,11 +7,14 @@ module AWS
     SECURITY_GROUP_NAME_MAX_LEN = 255
 
     def owner_id
-      security_group = create_random_security_group
-      return nil unless security_group
-      self_owner_id = security_group.owner_id
-      delete_random_security_group(security_group)
-      return self_owner_id
+      unless @owner_id
+        security_group = create_random_security_group
+        return nil unless security_group
+        @owner_id = security_group.owner_id
+        delete_random_security_group(security_group)
+      end
+
+      return @owner_id
     end
 
     private
