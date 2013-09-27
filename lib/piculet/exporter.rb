@@ -13,11 +13,11 @@ module Piculet
     def export
       result = {}
 
-      @ec2.security_groups.each do |security_group|
-        vpc = security_group.vpc
+      @ec2.security_groups.each do |sg|
+        vpc = sg.vpc
         vpc = vpc.id if vpc
         result[vpc] ||= {}
-        result[vpc][security_group.id] = export_security_group(security_group)
+        result[vpc][sg.id] = export_security_group(sg)
       end
 
       return result
@@ -35,12 +35,12 @@ module Piculet
     end
 
     def export_ip_permissions(ip_permissions)
-      ip_permissions.map do |ip_permission|
+      ip_permissions.map do |ip_perm|
         {
-          :protocol   => ip_permission.protocol,
-          :port_range => ip_permission.port_range,
-          :ip_ranges  => ip_permission.ip_ranges,
-          :groups => ip_permission.groups.map {|group|
+          :protocol   => ip_perm.protocol,
+          :port_range => ip_perm.port_range,
+          :ip_ranges  => ip_perm.ip_ranges,
+          :groups => ip_perm.groups.map {|group|
             {
               :id       => group.id,
               :name     => group.name,
