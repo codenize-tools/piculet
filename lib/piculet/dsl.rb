@@ -1,4 +1,5 @@
 require 'ostruct'
+require 'piculet/dsl-converter'
 
 module Piculet
   class DSL
@@ -7,6 +8,10 @@ module Piculet
         self.new(path) do
           eval(source, binding)
         end
+      end
+
+      def convert(exported, owner_id)
+        Converter.convert(exported, owner_id)
       end
     end # of class methods
 
