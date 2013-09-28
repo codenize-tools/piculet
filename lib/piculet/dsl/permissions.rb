@@ -1,4 +1,5 @@
 require 'piculet/dsl/permission'
+require 'set'
 
 module Piculet
   class DSL
@@ -10,7 +11,8 @@ module Piculet
           def initialize(security_group, direction, &block)
             @security_group = security_group
             @direction = direction
-            @result = {}
+            @result = []
+            @key_set = Set.new
             instance_eval(&block)
           end
 
@@ -22,11 +24,12 @@ module Piculet
 
             key = [protocol, port_range]
 
-            if @result.has_key?(key)
+            if @key_set.include?(key)
               raise "SecurityGroup `#{@security_group}`: #{@direction}: #{key} is already defined"
             end
 
-            @result[key] = Permission.new(@security_group, @direction, key, &block).result
+            @key_set << key
+            @result << Permission.new(@security_group, @direction, key, &block).result
           end
         end # Permissions
       end # SecurityGroup

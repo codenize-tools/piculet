@@ -32,7 +32,7 @@ module Piculet
         end
 
         def ingress(&block)
-          @result.ingress << Permissions.new(@name, :ingress, &block).result
+          @result.ingress = Permissions.new(@name, :ingress, &block).result
         end
 
         def egress(&block)
@@ -40,7 +40,7 @@ module Piculet
             raise "SecurityGroup `#{@name}`: Cannot define `egress` in classic"
           end
 
-          @result.egress << Permissions.new(@name, :egress, &block).result
+          @result.egress = Permissions.new(@name, :egress, &block).result
         end
       end # SecurityGroup
     end # EC2
