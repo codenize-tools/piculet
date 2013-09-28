@@ -16,7 +16,7 @@ module Piculet
 
       private
       def security_group(name, &block)
-        @result.security_groups << SecurityGroup.new(name, &block).result
+        @result.security_groups << SecurityGroup.new(name, @result.vpc, &block).result
       end
     end # EC2
   end # DSL
