@@ -7,6 +7,8 @@ module AWS
     SECURITY_GROUP_NAME_MAX_LEN = 255
 
     def owner_id
+      return ENV['AWS_OWNER_ID'] if ENV['AWS_OWNER_ID']
+
       unless @owner_id
         security_group = create_random_security_group
         return nil unless security_group
