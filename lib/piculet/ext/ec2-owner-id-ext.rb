@@ -40,7 +40,7 @@ module AWS
     def random_security_group_owner_id(security_group)
       owner_id = nil
 
-      (1..DESC_OWNER_ID_RETRY_TIMES).times do
+      (1..DESC_OWNER_ID_RETRY_TIMES).each do |i|
         begin
           owner_id = security_group.owner_id
           break
@@ -65,8 +65,6 @@ module AWS
 
         sleep DESC_OWNER_ID_RETRY_WAIT
       end
-
-      raise exception if exception
     end
 
     def random_security_group_name
