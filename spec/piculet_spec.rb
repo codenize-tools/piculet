@@ -7,16 +7,38 @@ require 'spec_helper'
 
 describe Piculet::Client do
   before(:each) {
-    #groupfile(:force => true) { '' }
+    groupfile { (<<-EOS)
+ec2 TEST_VPC_ID do
+  security_group "default" do
+    description "default VPC security group"
+  end
+end
+      EOS
+    }
+
+    @ec2 = AWS::EC2.new
   }
 
   after(:all) do
-    #groupfile(:force => true) { '' }
+    groupfile { (<<-EOS)
+ec2 "vpc-4f803c27" do
+  security_group "default" do
+    description "default VPC security group"
+  end
+end
+      EOS
+    }
   end
 
-  context 'XXX' do
+  context 'empty' do
     it  {
-      expect(1).to eq(1)
+      exported = export_security_groups
+      expect(exported.keys).to eq([TEST_VPC_ID])
+
+      sg_list = list_security_groups(exported[TEST_VPC_ID])
+      expect(sg_list).to eq([
+        {:name => "default", :description => "default VPC security group", :owner_id => TEST_OWNER_ID, :ingress => [], :egress => []},
+      ])
     }
   end
 end
