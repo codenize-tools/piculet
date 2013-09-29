@@ -2,7 +2,7 @@ require 'aws-sdk'
 
 TEST_VPC_ID = ENV['TEST_VPC_ID']
 TEST_OWNER_ID = ENV['TEST_OWNER_ID']
-RETRY_TIMES = 256
+RETRY_TIMES = 10
 EMPTY_ARRAY = []
 
 AWS.config({
@@ -28,9 +28,13 @@ def groupfile(options = {})
 
     client = Piculet::Client.new(options)
 
-    RETRY_TIMES.times do
-      updated = client.apply(tempfile) rescue nil
-      break unless updated.nil?
+    (1..RETRY_TIMES).each do |i|
+      begin
+        updated = client.apply(tempfile)
+        break
+      rescue AWS::EC2::Errors::InvalidGroup::NotFound => e
+        raise e unless i < RETRY_TIMES
+      end
     end
   ensure
     FileUtils.rm_f(tempfile)
