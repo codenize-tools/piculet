@@ -45,15 +45,16 @@ EOS
     end # it
   end # context ######################################################
 
-  context 'add ingress tcp permission allow from ip ranges' do #######
-    it do
-      groupfile { (<<EOS)
+  [:tcp, :udp].each do |protocol|
+    context "add #{protocol} ingress permission allow from ip ranges" do #
+      it do
+        groupfile { (<<"EOS")
 ec2 TEST_VPC_ID do
   security_group "default" do
     description "default VPC security group"
 
     ingress do
-      permission :tcp, 80..80 do
+      permission #{protocol.inspect}, 80..80 do
         ip_ranges(
           "0.0.0.0/0",
           "127.0.0.1/32"
@@ -63,29 +64,29 @@ ec2 TEST_VPC_ID do
   end # security_group
 end # ec2
 EOS
-      }
+        }
 
-      exported = export_security_groups
-      expect(exported.keys).to eq([TEST_VPC_ID])
+        exported = export_security_groups
+        expect(exported.keys).to eq([TEST_VPC_ID])
 
-      expect(exported[TEST_VPC_ID]).to eq([[
-        [:description , "default VPC security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , [[
-          [:groups     , EMPTY_ARRAY],
-          [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
-          [:port_range , 80..80],
-          [:protocol   , :tcp],
-        ]]],
-        [:name        , "default"],
-        [:owner_id    , TEST_OWNER_ID],
-      ]])
-    end # it
-  end # context ######################################################
+        expect(exported[TEST_VPC_ID]).to eq([[
+          [:description , "default VPC security group"],
+          [:egress      , EMPTY_ARRAY],
+          [:ingress     , [[
+            [:groups     , EMPTY_ARRAY],
+            [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
+            [:port_range , 80..80],
+            [:protocol   , protocol],
+          ]]],
+          [:name        , "default"],
+          [:owner_id    , TEST_OWNER_ID],
+        ]])
+      end # it
+    end # context ####################################################
 
-  context 'add ingress tcp permission allow from groups' do ##########
-    it do
-      groupfile { (<<EOS)
+    context "add #{protocol} ingress permission allow from groups" do #
+      it do
+        groupfile { (<<EOS)
 ec2 TEST_VPC_ID do
   security_group "any_other_security_group" do
     description "any other security group"
@@ -95,7 +96,7 @@ ec2 TEST_VPC_ID do
     description "default VPC security group"
 
     ingress do
-      permission :tcp, 80..80 do
+      permission #{protocol.inspect}, 80..80 do
         groups(
           "default",
           "any_other_security_group"
@@ -105,38 +106,38 @@ ec2 TEST_VPC_ID do
   end # security_group
 end # ec2
 EOS
-      }
+        }
 
-      exported = export_security_groups
-      expect(exported.keys).to eq([TEST_VPC_ID])
+        exported = export_security_groups
+        expect(exported.keys).to eq([TEST_VPC_ID])
 
-      expect(exported[TEST_VPC_ID]).to eq([[
-        [:description , "any other security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , EMPTY_ARRAY],
-        [:name        , "any_other_security_group"],
-        [:owner_id    , TEST_OWNER_ID],
-      ],[
-        [:description , "default VPC security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , [[
-          [:groups     , [
-            [[:name, "any_other_security_group"], [:owner_id, TEST_OWNER_ID]],
-            [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
-          ]],
-          [:ip_ranges  , EMPTY_ARRAY],
-          [:port_range , 80..80],
-          [:protocol   , :tcp],
-        ]]],
-        [:name        , "default"],
-        [:owner_id    , TEST_OWNER_ID],
-      ]])
-    end # it
-  end # context ######################################################
+        expect(exported[TEST_VPC_ID]).to eq([[
+          [:description , "any other security group"],
+          [:egress      , EMPTY_ARRAY],
+          [:ingress     , EMPTY_ARRAY],
+          [:name        , "any_other_security_group"],
+          [:owner_id    , TEST_OWNER_ID],
+        ],[
+          [:description , "default VPC security group"],
+          [:egress      , EMPTY_ARRAY],
+          [:ingress     , [[
+            [:groups     , [
+              [[:name, "any_other_security_group"], [:owner_id, TEST_OWNER_ID]],
+              [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
+            ]],
+            [:ip_ranges  , EMPTY_ARRAY],
+            [:port_range , 80..80],
+            [:protocol   , protocol],
+          ]]],
+          [:name        , "default"],
+          [:owner_id    , TEST_OWNER_ID],
+        ]])
+      end # it
+    end # context ####################################################
 
-  context 'add ingress tcp permission allow from ip ranges and groups' do #
-    it do
-      groupfile { (<<EOS)
+    context "add #{protocol} ingress permission allow from ip ranges and groups" do #
+      it do
+        groupfile { (<<EOS)
 ec2 TEST_VPC_ID do
   security_group "any_other_security_group" do
     description "any other security group"
@@ -146,7 +147,7 @@ ec2 TEST_VPC_ID do
     description "default VPC security group"
 
     ingress do
-      permission :tcp, 80..80 do
+      permission #{protocol.inspect}, 80..80 do
         ip_ranges(
           "0.0.0.0/0",
           "127.0.0.1/32"
@@ -160,32 +161,33 @@ ec2 TEST_VPC_ID do
   end # security_group
 end # ec2
 EOS
-      }
+        }
 
-      exported = export_security_groups
-      expect(exported.keys).to eq([TEST_VPC_ID])
+        exported = export_security_groups
+        expect(exported.keys).to eq([TEST_VPC_ID])
 
-      expect(exported[TEST_VPC_ID]).to eq([[
-        [:description , "any other security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , EMPTY_ARRAY],
-        [:name        , "any_other_security_group"],
-        [:owner_id    , TEST_OWNER_ID],
-      ],[
-        [:description , "default VPC security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , [[
-          [:groups     , [
-            [[:name, "any_other_security_group"], [:owner_id, TEST_OWNER_ID]],
-            [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
-          ]],
-          [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
-          [:port_range , 80..80],
-          [:protocol   , :tcp],
-        ]]],
-        [:name        , "default"],
-        [:owner_id    , TEST_OWNER_ID],
-      ]])
-    end # it
-  end # context ######################################################
+        expect(exported[TEST_VPC_ID]).to eq([[
+          [:description , "any other security group"],
+          [:egress      , EMPTY_ARRAY],
+          [:ingress     , EMPTY_ARRAY],
+          [:name        , "any_other_security_group"],
+          [:owner_id    , TEST_OWNER_ID],
+        ],[
+          [:description , "default VPC security group"],
+          [:egress      , EMPTY_ARRAY],
+          [:ingress     , [[
+            [:groups     , [
+              [[:name, "any_other_security_group"], [:owner_id, TEST_OWNER_ID]],
+              [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
+            ]],
+            [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
+            [:port_range , 80..80],
+            [:protocol   , protocol],
+          ]]],
+          [:name        , "default"],
+          [:owner_id    , TEST_OWNER_ID],
+        ]])
+      end # it
+    end # context ####################################################
+  end # each #########################################################
 end # default
