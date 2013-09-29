@@ -39,33 +39,28 @@ module AWS
 
     def random_security_group_owner_id(security_group)
       owner_id = nil
-      exception = nil
 
-      DESC_OWNER_ID_RETRY_TIMES.times do
+      (1..DESC_OWNER_ID_RETRY_TIMES).times do
         begin
           owner_id = security_group.owner_id
           break
         rescue => e
-          exception = e
+          raise e unless i < DESC_OWNER_ID_RETRY_TIMES
         end
 
         sleep DESC_OWNER_ID_RETRY_WAIT
       end
 
-      raise exception if exception
-
       return owner_id
     end
 
     def delete_random_security_group(security_group)
-      exception = nil
-
-      DESC_OWNER_ID_RETRY_TIMES.times do
+      (1..DESC_OWNER_ID_RETRY_TIMES).each do |i|
         begin
           security_group.delete
           break
         rescue => e
-          exception = e
+          raise e unless i < DESC_OWNER_ID_RETRY_TIMES
         end
 
         sleep DESC_OWNER_ID_RETRY_WAIT
