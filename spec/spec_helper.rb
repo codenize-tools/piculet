@@ -49,6 +49,8 @@ def export_security_groups(options = {})
     })
   end
 
+  sleep ENV['TEST_EXPORT_DELAY'].to_f
+
   client = Piculet::Client.new(options)
   exported = client.export {|e, c| e }
 
