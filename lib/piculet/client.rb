@@ -21,7 +21,16 @@ module Piculet
 
     def export
       exported = AWS.memoize { Exporter.export(@options.ec2) }
-      DSL.convert(exported, @options.ec2.owner_id)
+
+      if block_given?
+        converter = proc do |src|
+          DSL.convert(src, @options.ec2.owner_id)
+        end
+
+        yield(exported, converter)
+      else
+        DSL.convert(exported, @options.ec2.owner_id)
+      end
     end
 
     private
@@ -81,6 +90,10 @@ module Piculet
     end
 
     def walk_security_group(security_group_dsl, security_group_aws)
+      unless security_group_aws.eql?(security_group_dsl)
+        security_group_aws.update(security_group_dsl)
+      end
+
       walk_permissions(
         security_group_dsl.ingress,
         security_group_aws.ingress_ip_permissions)

@@ -18,6 +18,18 @@ module Piculet
           @options = options
         end
 
+        def eql?(dsl)
+          @security_group.description == dsl.description
+        end
+
+        def update(dsl)
+          if @security_group.description != dsl.description
+            log(:warn, '`description` cannot be updated', :yellow, "#{vpc_id || :classic} > #{name}")
+          end
+
+          # XXX:
+        end
+
         def delete
           log(:info, 'Delete SecurityGroup', :red, "#{vpc_id || :classic} > #{name}")
 

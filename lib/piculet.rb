@@ -1,5 +1,3 @@
-require "piculet/version"
-
-module Piculet
-  # Your code goes here...
-end
+require 'piculet/version'
+require 'piculet/client'
+require 'piculet/logger'
