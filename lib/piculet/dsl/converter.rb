@@ -23,7 +23,7 @@ module Piculet
         vpc = vpc ? vpc.inspect + ' ' : ''
         security_groups = security_groups.map {|sg_id, sg|
           output_security_group(sg_id, sg)
-        }.join("\n\n").strip
+        }.join("\n").strip
 
         <<-EOS
 ec2 #{vpc}do
@@ -89,7 +89,7 @@ end
 
       def output_ip_ranges(ip_ranges)
         return nil if ip_ranges.empty?
-        ip_ranges = ip_ranges.map {|i| i.inspect }.join(",\n        ")
+        ip_ranges = ip_ranges.map {|i| i.inspect }.join(",\n          ")
 
         <<-EOS
         ip_ranges(
@@ -105,9 +105,9 @@ end
           name_or_id = i[:name] || i[:id]
           owner_id = i[:owner_id]
 
-          arg = @owner_id == owner_id ? name_or_id : [owner_id, name_or_id]
+          arg = @owner_id == owner_id ? name_or_id : [owner_id, i[:id]]
           arg.inspect
-        }.join(",\n        ")
+        }.join(",\n          ")
 
         <<-EOS
         groups(

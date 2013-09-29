@@ -1,3 +1,5 @@
+require 'piculet/ext/ip-permission-collection-ext'
+
 module Piculet
   class Exporter
     class << self
@@ -35,6 +37,8 @@ module Piculet
     end
 
     def export_ip_permissions(ip_permissions)
+      ip_permissions = ip_permissions ? ip_permissions.aggregate : []
+
       ip_permissions.map do |ip_perm|
         {
           :protocol   => ip_perm.protocol,

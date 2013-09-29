@@ -20,7 +20,7 @@ module Piculet
 
     def initialize(path, &block)
       @path = path
-      @result = OpenStruct.new(:ec2s => [])
+      @result = OpenStruct.new(:ec2s => {})
       instance_eval(&block)
     end
 
@@ -38,7 +38,7 @@ module Piculet
     end
 
     def ec2(vpc = nil, &block)
-      @result.ec2s << EC2.new(vpc, &block).result
+      @result.ec2s[vpc] = EC2.new(vpc, &block).result
     end
   end # DSL
 end # Piculet

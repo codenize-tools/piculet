@@ -1,19 +1,29 @@
+require 'ostruct'
 require 'piculet/dsl/permission'
-require 'set'
 
 module Piculet
   class DSL
     class EC2
       class SecurityGroup
         class Permissions
-          attr_reader :result
-
           def initialize(security_group, direction, &block)
             @security_group = security_group
             @direction = direction
-            @result = []
-            @key_set = Set.new
+            @result = {}
             instance_eval(&block)
+          end
+
+          def result
+            @result.map do |key, perm|
+              protocol, port_range = key
+
+              OpenStruct.new({
+                :protocol   => protocol,
+                :port_range => port_range,
+                :ip_ranges  => perm.ip_ranges,
+                :groups     => perm.groups,
+              })
+            end
           end
 
           private
@@ -24,12 +34,11 @@ module Piculet
 
             key = [protocol, port_range]
 
-            if @key_set.include?(key)
+            if @result.has_key?(key)
               raise "SecurityGroup `#{@security_group}`: #{@direction}: #{key} is already defined"
             end
 
-            @key_set << key
-            @result << Permission.new(@security_group, @direction, key, &block).result
+            @result[key] = Permission.new(@security_group, @direction, key, &block).result
           end
         end # Permissions
       end # SecurityGroup
