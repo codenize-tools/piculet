@@ -1,6 +1,8 @@
 # Piculet
 
-TODO: Write a gem description
+Piculet is a tool to manage Security Group.
+
+It defines the state of Security Group using DSL, and updates Security Group according to DSL.
 
 ## Installation
 
@@ -18,12 +20,105 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+shell> export AWS_ACCESS_KEY_ID='...'
+shell> export AWS_SECRET_ACCESS_KEY='...'
+shell> export AWS_REGION='ap-northeast-1'
+shell> piculet -e -o Groupfile
+shell> vi Groupfile
+shell> piculet -a --dry-run
+shell> piculet -a
+```
 
-## Contributing
+## Routefile example
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+```ruby
+require 'other/groupfile'
+
+ec2 do
+  security_group "default" do
+    description "default group"
+
+    ingress do
+      permission :tcp, 0..65535 do
+        groups(
+          "default"
+        )
+      end
+      permission :udp, 0..65535 do
+        groups(
+          "default"
+        )
+      end
+      permission :icmp, -1..-1 do
+        groups(
+          "default"
+        )
+      end
+      permission :tcp, 22..22 do
+        ip_ranges(
+          "0.0.0.0/0"
+        )
+      end
+      permission :udp, 60000..61000 do
+        ip_ranges(
+          "0.0.0.0/0",
+        )
+      end
+    end
+  end
+end
+
+ec2 "vpc-XXXXXXXX" do
+  security_group "default" do
+    description "default VPC security group"
+
+    ingress do
+      permission :tcp, 22..22 do
+        ip_ranges(
+          "0.0.0.0/0",
+        )
+      end
+      permission :tcp, 80..80 do
+        ip_ranges(
+          "0.0.0.0/0"
+        )
+      end
+      permission :udp, 60000..61000 do
+        ip_ranges(
+          "0.0.0.0/0"
+        )
+      end
+      permission :any do
+        groups(
+          "any_other_group",
+          "default"
+        )
+      end
+    end
+
+    egress do
+      permission :any do
+        ip_ranges(
+          "0.0.0.0/0"
+        )
+      end
+    end
+  end
+
+  security_group "any_other_group" do
+    description "any_other_group"
+
+    egress do
+      permission :any do
+        ip_ranges(
+          "0.0.0.0/0"
+        )
+      end
+    end
+  end
+end
+```
+
+## Link
+* [RubyGems.org site](http://rubygems.org/gems/piculet)
