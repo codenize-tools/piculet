@@ -8,16 +8,17 @@ Gem::Specification.new do |spec|
   spec.version       = Piculet::VERSION
   spec.authors       = ["winebarrel"]
   spec.email         = ["sgwr_dts@yahoo.co.jp"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = "Piculet is a tool to manage Security Group. It defines the state of Security Group using DSL, and updates Security Group according to DSL."
+  spec.summary       = "Piculet is a tool to manage Security Group."
+  spec.homepage      = "https://bitbucket.org/winebarrel/piculet"
   spec.license       = "MIT"
+  spec.files         = %w(README.md) + Dir.glob('bin/**/*') + Dir.glob('lib/**/*')
 
   spec.add_dependency "aws-sdk", ">= 1.19.0"
   spec.add_dependency "term-ansicolor", ">= 1.2.2"
-  spec.files         = `git ls-files`.split($/)
+  #spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  #spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
