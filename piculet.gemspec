@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Piculet::VERSION
   spec.authors       = ["winebarrel"]
   spec.email         = ["sgwr_dts@yahoo.co.jp"]
-  spec.description   = "Piculet is a tool to manage Security Group. It defines the state of Security Group using DSL, and updates Security Group according to DSL."
-  spec.summary       = "Piculet is a tool to manage Security Group."
+  spec.description   = "Piculet is a tool to manage EC2 Security Group. It defines the state of EC2 Security Group using DSL, and updates EC2 Security Group according to DSL."
+  spec.summary       = "Piculet is a tool to manage EC2 Security Group."
   spec.homepage      = "https://bitbucket.org/winebarrel/piculet"
   spec.license       = "MIT"
   spec.files         = %w(README.md) + Dir.glob('bin/**/*') + Dir.glob('lib/**/*')

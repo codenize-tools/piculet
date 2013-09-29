@@ -1,8 +1,8 @@
 # Piculet
 
-Piculet is a tool to manage Security Group.
+Piculet is a tool to manage EC2 Security Group.
 
-It defines the state of Security Group using DSL, and updates Security Group according to DSL.
+It defines the state of EC2 Security Group using DSL, and updates EC2 Security Group according to DSL.
 
 [![Build Status](https://drone.io/bitbucket.org/winebarrel/piculet/status.png)](https://drone.io/bitbucket.org/winebarrel/piculet/latest)
 
