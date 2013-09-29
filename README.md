@@ -4,6 +4,8 @@ Piculet is a tool to manage Security Group.
 
 It defines the state of Security Group using DSL, and updates Security Group according to DSL.
 
+[![Build Status](https://drone.io/bitbucket.org/winebarrel/piculet/status.png)](https://drone.io/bitbucket.org/winebarrel/piculet/latest)
+
 ## Installation
 
 Add this line to your application's Gemfile:
