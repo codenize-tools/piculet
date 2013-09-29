@@ -30,7 +30,7 @@ shell> piculet -a --dry-run
 shell> piculet -a
 ```
 
-## Routefile example
+## Groupfile example
 
 ```ruby
 require 'other/groupfile'
