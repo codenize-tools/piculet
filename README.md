@@ -24,6 +24,7 @@ Or install it yourself as:
 shell> export AWS_ACCESS_KEY_ID='...'
 shell> export AWS_SECRET_ACCESS_KEY='...'
 shell> export AWS_REGION='ap-northeast-1'
+shell> #export AWS_OWNER_ID='123456789012'
 shell> piculet -e -o Groupfile
 shell> vi Groupfile
 shell> piculet -a --dry-run
