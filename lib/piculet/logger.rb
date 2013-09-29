@@ -25,7 +25,7 @@ module Piculet
         message = "[#{level.to_s.upcase}] #{message}" unless level == :info
         message << ": #{log_id}" if log_id
         message << ' (dry-run)' if @options && @options.dry_run
-        logger = Piculet::Logger.instance
+        logger = (@options && @options.logger) || Piculet::Logger.instance
         logger.send(level, message.send(color))
       end
     end # ClientHelper
