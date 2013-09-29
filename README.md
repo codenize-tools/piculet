@@ -22,15 +22,15 @@ Or install it yourself as:
 
 ## Usage
 
-```
-shell> export AWS_ACCESS_KEY_ID='...'
-shell> export AWS_SECRET_ACCESS_KEY='...'
-shell> export AWS_REGION='ap-northeast-1'
-shell> #export AWS_OWNER_ID='123456789012'
-shell> piculet -e -o Groupfile
-shell> vi Groupfile
-shell> piculet -a --dry-run
-shell> piculet -a
+```sh
+export AWS_ACCESS_KEY_ID='...'
+export AWS_SECRET_ACCESS_KEY='...'
+export AWS_REGION='ap-northeast-1'
+#export AWS_OWNER_ID='123456789012'
+piculet -e -o Groupfile
+vi Groupfile
+piculet -a --dry-run
+piculet -a
 ```
 
 ## Groupfile example
