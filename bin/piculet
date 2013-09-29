@@ -19,9 +19,11 @@ ARGV.options do |opt|
   begin
     access_key = nil
     secret_key = nil
+    region = nil
 
     opt.on('-k', '--access-key ACCESS_KEY') {|v| access_key                   = v       }
     opt.on('-s', '--secret-key SECRET_KEY') {|v| secret_key                   = v       }
+    opt.on('-r', '--region REGION')         {|v| region                       = v       }
     opt.on('-a', '--apply')                 {|v| mode                         = :apply  }
     opt.on('-f', '--file FILE')             {|v| file                         = v       }
     opt.on('',   '--dry-run')               {|v| options[:dry_run]            = true    }
@@ -34,10 +36,12 @@ ARGV.options do |opt|
     opt.parse!
 
     if access_key and secret_key
-      AWS.config({
+      aws_opts = {
         :access_key_id     => access_key,
         :secret_access_key => secret_key,
-      })
+      }
+      aws_opts[:region] = region if region
+      AWS.config(aws_opts)
     elsif (access_key and !secret_key) or (!access_key and secret_key) or mode.nil?
       puts opt.help
       exit 1
