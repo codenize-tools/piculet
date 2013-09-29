@@ -17,8 +17,6 @@ module Piculet
     def apply(file)
       @options.ec2.owner_id
       AWS.memoize { walk(file) }
-
-      #return updated
     end
 
     def export
@@ -58,6 +56,8 @@ module Piculet
           log(:warn, "EC2 `#{vpc || :classic}` is not found", :yellow)
         end
       end
+
+      ec2.updated?
     end
 
     def walk_ec2(vpc, ec2_dsl, ec2_aws, collection_api)
@@ -101,7 +101,9 @@ module Piculet
         perm_aws = perm_list_aws.delete(key)
 
         if perm_aws
-          perm_aws.update(perm_dsl) unless perm_aws.eql?(perm_dsl)
+          unless perm_aws.eql?(perm_dsl)
+            perm_aws.update(perm_dsl)
+          end
         else
           permissions_aws.create(protocol, port_range, perm_dsl)
         end

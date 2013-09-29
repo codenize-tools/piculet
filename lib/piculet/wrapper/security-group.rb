@@ -24,7 +24,10 @@ module Piculet
           if name == 'default'
             log(:warn, 'SecurityGroup `default` is reserved', :yellow)
           else
-            @security_group.delete unless @options.dry_run
+            unless @options.dry_run
+              @security_group.delete
+              @options.updated = true
+            end
           end
         end
 

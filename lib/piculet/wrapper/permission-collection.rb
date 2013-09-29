@@ -26,27 +26,37 @@ module Piculet
 
           def authorize(protocol, ports, *sources)
             log(:info, "  authorize #{format_sources(sources)}", :green)
-            sources = normalize_sources(sources)
 
-            case @direction
-            when :ingress
-              @security_group.authorize_ingress(protocol, ports, *sources)
-            when :egress
-              sources.push(:protocol => protocol, :ports => ports)
-              @security_group.authorize_egress(*sources)
+            unless @options.dry_run
+              sources = normalize_sources(sources)
+
+              case @direction
+              when :ingress
+                @security_group.authorize_ingress(protocol, ports, *sources)
+                @options.updated = true
+              when :egress
+                sources.push(:protocol => protocol, :ports => ports)
+                @security_group.authorize_egress(*sources)
+                @options.updated = true
+              end
             end
           end
 
           def revoke(protocol, ports, *sources)
             log(:info, "  revoke #{format_sources(sources)}", :green)
-            sources = normalize_sources(sources)
 
-            case @direction
-            when :ingress
-              @security_group.revoke_ingress(protocol, ports, *sources)
-            when :egress
-              sources.push(:protocol => protocol, :ports => ports)
-              @security_group.revoke_egress(*sources)
+            unless @options.dry_run
+              sources = normalize_sources(sources)
+
+              case @direction
+              when :ingress
+                @security_group.revoke_ingress(protocol, ports, *sources)
+                @options.updated = true
+              when :egress
+                sources.push(:protocol => protocol, :ports => ports)
+                @security_group.revoke_egress(*sources)
+                @options.updated = true
+              end
             end
           end
 
