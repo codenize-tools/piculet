@@ -21,7 +21,7 @@ EOS
 
   after(:all) do
     groupfile { (<<-EOS)
-ec2 "vpc-4f803c27" do
+ec2 TEST_VPC_ID do
   security_group "default" do
     description "default VPC security group"
   end # security_group
@@ -46,7 +46,7 @@ EOS
   end # context ######################################################
 
   [:ingress, :egress].each do |direction|
-    [:tcp, :udp].each do |protocol|
+    [[:tcp, 80..81], [:udp, 53..54], [:any, nil]].each do |protocol, port_range|
       context "add #{protocol} #{direction} permission allow from ip ranges" do #
         it do
           groupfile { (<<"EOS")
@@ -55,7 +55,7 @@ ec2 TEST_VPC_ID do
     description "default VPC security group"
 
     #{direction} do
-      permission #{protocol.inspect}, 80..80 do
+      permission #{protocol.inspect}, #{port_range.inspect} do
         ip_ranges(
           "0.0.0.0/0",
           "127.0.0.1/32"
@@ -70,7 +70,7 @@ EOS
           expected_permissions = [[
             [:groups     , EMPTY_ARRAY],
             [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
-            [:port_range , 80..80],
+            [:port_range , port_range],
             [:protocol   , protocol],
           ]]
 
@@ -110,7 +110,7 @@ ec2 TEST_VPC_ID do
     description "default VPC security group"
 
     #{direction} do
-      permission #{protocol.inspect}, 80..80 do
+      permission #{protocol.inspect}, #{port_range.inspect} do
         groups(
           "default",
           "any_other_security_group"
@@ -128,7 +128,7 @@ EOS
               [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
             ]],
             [:ip_ranges  , EMPTY_ARRAY],
-            [:port_range , 80..80],
+            [:port_range , port_range],
             [:protocol   , protocol],
           ]]
 
@@ -174,7 +174,7 @@ ec2 TEST_VPC_ID do
     description "default VPC security group"
 
     #{direction} do
-      permission #{protocol.inspect}, 80..80 do
+      permission #{protocol.inspect}, #{port_range.inspect} do
         ip_ranges(
           "0.0.0.0/0",
           "127.0.0.1/32"
@@ -196,7 +196,7 @@ EOS
               [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
             ]],
             [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
-            [:port_range , 80..80],
+            [:port_range , port_range],
             [:protocol   , protocol],
           ]]
 
