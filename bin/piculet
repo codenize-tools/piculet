@@ -47,7 +47,7 @@ ARGV.options do |opt|
       exit 1
     end
   rescue => e
-    $stderr.puts e
+    $stderr.puts("[ERROR] #{e.message}")
     exit 1
   end
 end
@@ -64,7 +64,7 @@ end
 begin
   logger = Piculet::Logger.instance
   logger.set_debug(options[:debug])
-   client = Piculet::Client.new(options)
+  client = Piculet::Client.new(options)
 
   case mode
   when :export
@@ -122,7 +122,7 @@ rescue => e
   if options[:debug]
     raise e
   else
-    $stderr.puts e
+    $stderr.puts("[ERROR] #{e.message}".red)
     exit 1
   end
 end
