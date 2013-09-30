@@ -147,6 +147,87 @@ EOS
         end # it
       end # context ##################################################
 
+      context "add #{protocol} #{direction} permission allow from groups (using security groups id)" do #
+        before do
+          groupfile { (<<EOS)
+ec2 TEST_VPC_ID do
+  security_group "any_other_security_group" do
+    description "any other security group"
+  end
+
+  security_group "default" do
+    description "default VPC security group"
+  end # security_group
+end # ec2
+EOS
+          }
+        end
+
+        it do
+          any_other_security_group_id = export_security_groups(:include_security_group_id => true)[TEST_VPC_ID][0][0]
+
+          groupfile { (<<EOS)
+ec2 TEST_VPC_ID do
+  security_group "any_other_security_group" do
+    description "any other security group"
+  end
+
+  security_group "default" do
+    description "default VPC security group"
+
+    #{direction} do
+      permission #{protocol.inspect}, #{port_range.inspect} do
+        groups(
+          "default",
+          "#{any_other_security_group_id}"
+        )
+      end # permission
+    end # ingress
+  end # security_group
+end # ec2
+EOS
+          }
+
+          expected_permissions = [[
+            [:groups     , [
+              [[:name, "any_other_security_group"], [:owner_id, TEST_OWNER_ID]],
+              [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
+            ]],
+            [:ip_ranges  , EMPTY_ARRAY],
+            [:port_range , port_range],
+            [:protocol   , protocol],
+          ]]
+
+          case direction
+          when :ingress
+            egress_value = EMPTY_ARRAY
+            ingress_value = expected_permissions
+          when :egress
+            egress_value = expected_permissions
+            ingress_value = EMPTY_ARRAY
+          else
+            raise 'must not happen'
+          end
+
+          exported = export_security_groups
+          expect(exported.keys).to eq([TEST_VPC_ID])
+
+          expect(exported[TEST_VPC_ID]).to eq([[
+            [:description , "any other security group"],
+            [:egress      , EMPTY_ARRAY],
+            [:ingress     , EMPTY_ARRAY],
+            [:name        , "any_other_security_group"],
+            [:owner_id    , TEST_OWNER_ID],
+          ],[
+            [:description , "default VPC security group"],
+            [:egress      , egress_value],
+            [:ingress     , ingress_value],
+            [:name        , "default"],
+            [:owner_id    , TEST_OWNER_ID],
+          ]])
+        end # it
+      end # context ##################################################
+
       context "add #{protocol} #{direction} permission allow from ip ranges and groups" do #
         it do
           groupfile { (<<EOS)

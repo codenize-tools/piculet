@@ -80,7 +80,15 @@ def export_security_groups(options = {})
       end
     end
 
-    exported[vpc] = security_groups.sort_by {|sg_id, sg| sg[:name] }.map {|sg_id, sg| sg.sort_by {|k, v| k } }
+    exported[vpc] = security_groups.sort_by {|sg_id, sg| sg[:name] }.map {|sg_id, sg|
+      sg = sg.sort_by {|k, v| k }
+
+      if options[:include_security_group_id]
+        [sg_id, sg]
+      else
+        sg
+      end
+    }
   end
 
   return exported
