@@ -32,15 +32,26 @@ module Piculet
         end
 
         def ingress(&block)
+          if @ingress_is_defined
+            raise "SecurityGroup `#{@name}`: `ingress` is already defined"
+          end
+
           @result.ingress = Permissions.new(@name, :ingress, &block).result
+          @ingress_is_defined = true
         end
 
         def egress(&block)
+          if @egress_is_defined
+            raise "SecurityGroup `#{@name}`: `egress` is already defined"
+          end
+
           unless @vpc
             raise "SecurityGroup `#{@name}`: Cannot define `egress` in classic"
           end
 
           @result.egress = Permissions.new(@name, :egress, &block).result
+
+          @egress_is_defined = true
         end
       end # SecurityGroup
     end # EC2
