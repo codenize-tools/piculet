@@ -31,7 +31,7 @@ EOS
   end
 
   [:ingress, :egress].each do |direction|
-    [[:tcp, 80..81], [:udp, 53..54], [:any, nil]].each do |protocol, port_range|
+    [[:tcp, 80..81], [:udp, 53..54], [:any, nil], [:icmp, -1..-1]].each do |protocol, port_range|
       context "add #{protocol} #{direction} permission allow from ip ranges" do #
         it do
           groupfile { (<<"EOS")
