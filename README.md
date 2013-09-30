@@ -27,10 +27,10 @@ export AWS_ACCESS_KEY_ID='...'
 export AWS_SECRET_ACCESS_KEY='...'
 export AWS_REGION='ap-northeast-1'
 #export AWS_OWNER_ID='123456789012'
-piculet -e -o Groupfile
+piculet -e -o Groupfile  # export EC2 SecurityGroup
 vi Groupfile
 piculet -a --dry-run
-piculet -a
+piculet -a               # apply `Groupfile` to EC2 SecurityGroup
 ```
 
 ## Groupfile example
