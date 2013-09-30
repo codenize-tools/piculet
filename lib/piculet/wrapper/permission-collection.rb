@@ -96,10 +96,14 @@ module Piculet
               when Array
                 owner_id, group = src
 
-                unless group =~ /\Asg-[0-9a-f]\Z/
+                unless group =~ /\Asg-[0-9a-f]+\Z/
                   sg_coll = @options.ec2.security_groups.filter('group-name', group)
-                  sg_coll = sg_coll.filter('vpc-id', @security_group.vpc_id) if @security_group.vpc?
-                  sg_coll = sg_coll.filter('owner-id', owner_id) unless @options.ec2.own?(owner_id)
+
+                  if @options.ec2.own?(owner_id)
+                    sg_coll = sg_coll.filter('vpc-id', @security_group.vpc_id) if @security_group.vpc?
+                  else
+                    sg_coll = sg_coll.filter('owner-id', owner_id)
+                  end
 
                   unless (sg = sg_coll.first)
                     raise "Can't find SecurityGroup: #{owner_id}/#{group} in #{@security_group.vpc_id || :classic}"
