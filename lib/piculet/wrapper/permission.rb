@@ -31,11 +31,11 @@ module Piculet
               plus_ip_ranges, minus_ip_ranges, plus_groups, minus_groups = diff(dsl)
 
               unless (plus_ip_ranges + plus_groups).empty?
-                @collection.authorize(protocol, port_range, (plus_ip_ranges + plus_groups))
+                @collection.authorize(protocol, port_range, (plus_ip_ranges + plus_groups), :log_color => :green)
               end
 
               unless (minus_ip_ranges + minus_groups).empty?
-                @collection.revoke(protocol, port_range, (minus_ip_ranges + minus_groups))
+                @collection.revoke(protocol, port_range, (minus_ip_ranges + minus_groups), :log_color => :green)
               end
             end
 
@@ -45,7 +45,7 @@ module Piculet
               self_ip_ranges, self_groups = normalize_self_attrs
 
               unless (self_ip_ranges + self_groups).empty?
-                @collection.revoke(protocol, port_range, (self_ip_ranges + self_groups))
+                @collection.revoke(protocol, port_range, (self_ip_ranges + self_groups), :log_color => :red)
               end
             end
 

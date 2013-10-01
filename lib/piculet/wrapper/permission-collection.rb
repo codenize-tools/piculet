@@ -24,8 +24,8 @@ module Piculet
             end
           end
 
-          def authorize(protocol, ports, sources)
-            log(:info, "  authorize #{format_sources(sources)}", :green)
+          def authorize(protocol, ports, sources, opts = {})
+            log(:info, "  authorize #{format_sources(sources)}", opts.fetch(:log_color, :green))
 
             unless @options.dry_run
               sources = normalize_sources(sources)
@@ -42,8 +42,8 @@ module Piculet
             end
           end
 
-          def revoke(protocol, ports, sources)
-            log(:info, "  revoke #{format_sources(sources)}", :green)
+          def revoke(protocol, ports, sources, opts = {})
+            log(:info, "  revoke #{format_sources(sources)}", opts.fetch(:log_color, :green))
 
             unless @options.dry_run
               sources = normalize_sources(sources)
@@ -70,7 +70,7 @@ module Piculet
 
             unless sources.empty?
               log(:info, 'Create Permission', :cyan, "#{log_id} > #{protocol} #{port_range}")
-              authorize(protocol, port_range, sources)
+              authorize(protocol, port_range, sources, :log_color => :cyan)
             end
           end
 
