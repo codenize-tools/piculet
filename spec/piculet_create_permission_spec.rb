@@ -348,6 +348,12 @@ EOS
       expect(exported.keys).to eq([TEST_VPC_ID])
 
       expect(exported[TEST_VPC_ID]).to eq([[
+        [:description , "default VPC security group"],
+        [:egress      , EMPTY_ARRAY],
+        [:ingress     , EMPTY_ARRAY],
+        [:name        , "default"],
+        [:owner_id    , TEST_OWNER_ID],
+      ],[
         [:description , "security group A"],
         [:egress      , EMPTY_ARRAY],
         [:ingress     , [[
@@ -358,7 +364,7 @@ EOS
           [:port_range , 80..80],
           [:protocol   , :tcp],
         ]]],
-        [:name        , "security_group_b"],
+        [:name        , "security_group_a"],
         [:owner_id    , TEST_OWNER_ID],
       ],[
         [:description , "security group B"],
@@ -371,13 +377,7 @@ EOS
           [:port_range , 80..80],
           [:protocol   , :tcp],
         ]]],
-        [:name        , "security_group_a"],
-        [:owner_id    , TEST_OWNER_ID],
-      ],[
-        [:description , "default VPC security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , EMPTY_ARRAY],
-        [:name        , "default"],
+        [:name        , "security_group_b"],
         [:owner_id    , TEST_OWNER_ID],
       ]])
     end # it
