@@ -296,10 +296,9 @@ EOS
         end # it
       end # context ##################################################
     end # each #######################################################
-  end # each #########################################################
 
-  context "add cross-reference permission" do ######################
-    before do
+    context "add cross-reference #{direction} permission" do ######################
+      before do
         groupfile { (<<EOS)
 ec2 TEST_VPC_ID do
   security_group "default" do
@@ -307,16 +306,16 @@ ec2 TEST_VPC_ID do
   end # security_group
 end # ec2
 EOS
-      }
-    end
+        }
+      end
 
-    it do
-      groupfile { (<<EOS)
+      it do
+        groupfile { (<<EOS)
 ec2 TEST_VPC_ID do
   security_group "security_group_a" do
     description "security group A"
 
-    ingress do
+    #{direction} do
       permission :tcp, 80..80 do
         groups(
           "security_group_b",
@@ -328,7 +327,7 @@ ec2 TEST_VPC_ID do
   security_group "security_group_b" do
     description "security group B"
 
-    ingress do
+    #{direction} do
       permission :tcp, 80..80 do
         groups(
           "security_group_a",
@@ -342,44 +341,53 @@ ec2 TEST_VPC_ID do
   end # security_group
 end # ec2
 EOS
-      }
+        }
 
-      exported = export_security_groups
-      expect(exported.keys).to eq([TEST_VPC_ID])
+        expected_permissions = proc do |sg_name|
+          [[
+            [:groups     , [
+              [[:name, sg_name], [:owner_id, TEST_OWNER_ID]],
+            ]],
+            [:ip_ranges  , EMPTY_ARRAY],
+            [:port_range , 80..80],
+            [:protocol   , :tcp],
+          ]]
+        end
 
-      expect(exported[TEST_VPC_ID]).to eq([[
-        [:description , "default VPC security group"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , EMPTY_ARRAY],
-        [:name        , "default"],
-        [:owner_id    , TEST_OWNER_ID],
-      ],[
-        [:description , "security group A"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , [[
-          [:groups     , [
-            [[:name, "security_group_b"], [:owner_id, TEST_OWNER_ID]],
-          ]],
-          [:ip_ranges  , EMPTY_ARRAY],
-          [:port_range , 80..80],
-          [:protocol   , :tcp],
-        ]]],
-        [:name        , "security_group_a"],
-        [:owner_id    , TEST_OWNER_ID],
-      ],[
-        [:description , "security group B"],
-        [:egress      , EMPTY_ARRAY],
-        [:ingress     , [[
-          [:groups     , [
-            [[:name, "security_group_a"], [:owner_id, TEST_OWNER_ID]],
-          ]],
-          [:ip_ranges  , EMPTY_ARRAY],
-          [:port_range , 80..80],
-          [:protocol   , :tcp],
-        ]]],
-        [:name        , "security_group_b"],
-        [:owner_id    , TEST_OWNER_ID],
-      ]])
-    end # it
-  end # context ##################################################
+        case direction
+        when :ingress
+          egress_value = proc {|i| EMPTY_ARRAY }
+          ingress_value = expected_permissions
+        when :egress
+          egress_value = expected_permissions
+          ingress_value = proc {|i| EMPTY_ARRAY }
+        else
+          raise 'must not happen'
+        end
+
+        exported = export_security_groups
+        expect(exported.keys).to eq([TEST_VPC_ID])
+
+        expect(exported[TEST_VPC_ID]).to eq([[
+          [:description , "default VPC security group"],
+          [:egress      , EMPTY_ARRAY],
+          [:ingress     , EMPTY_ARRAY],
+          [:name        , "default"],
+          [:owner_id    , TEST_OWNER_ID],
+        ],[
+          [:description , "security group A"],
+          [:egress      , egress_value.call('security_group_b')],
+          [:ingress     , ingress_value.call('security_group_b')],
+          [:name        , "security_group_a"],
+          [:owner_id    , TEST_OWNER_ID],
+        ],[
+          [:description , "security group B"],
+          [:egress      , egress_value.call('security_group_a')],
+          [:ingress     , ingress_value.call('security_group_a')],
+          [:name        , "security_group_b"],
+          [:owner_id    , TEST_OWNER_ID],
+        ]])
+      end # it
+    end # context ##################################################
+  end # each #########################################################
 end # default
