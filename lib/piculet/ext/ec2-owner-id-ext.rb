@@ -10,13 +10,6 @@ module AWS
       return ENV['AWS_OWNER_ID'] if ENV['AWS_OWNER_ID']
       return @owner_id if @owner_id
 
-      unless @owner_id
-        security_group = create_random_security_group
-        return nil unless security_group
-        @owner_id = random_security_group_owner_id(security_group)
-        delete_random_security_group(security_group)
-      end
-
       @owner_id = get_owner_id_from_iam || get_owner_id_from_security_group
 
       return @owner_id
