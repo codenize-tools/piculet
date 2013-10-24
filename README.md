@@ -27,6 +27,8 @@ export AWS_ACCESS_KEY_ID='...'
 export AWS_SECRET_ACCESS_KEY='...'
 export AWS_REGION='ap-northeast-1'
 #export AWS_OWNER_ID='123456789012'
+# Note: If you do not set the OWNER_ID,
+#       Piculet get the OWNER_ID from GetUser(IAM) or CreateSecurityGroup(EC2)
 piculet -e -o Groupfile  # export EC2 SecurityGroup
 vi Groupfile
 piculet -a --dry-run
