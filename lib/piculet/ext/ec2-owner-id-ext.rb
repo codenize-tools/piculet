@@ -8,6 +8,7 @@ module AWS
 
     def owner_id
       return ENV['AWS_OWNER_ID'] if ENV['AWS_OWNER_ID']
+      return @owner_id if @owner_id
 
       unless @owner_id
         security_group = create_random_security_group
@@ -15,6 +16,8 @@ module AWS
         @owner_id = random_security_group_owner_id(security_group)
         delete_random_security_group(security_group)
       end
+
+      @owner_id = get_owner_id_from_iam || get_owner_id_from_security_group
 
       return @owner_id
     end
@@ -24,6 +27,23 @@ module AWS
     end
 
     private
+    def get_owner_id_from_iam
+      credentials = self.config.credential_provider.credentials
+      iam = AWS::IAM.new(credentials)
+      user = iam.client.get_user rescue nil
+      return nil unless user
+      arn = user[:user][:arn]
+      arn.split(':')[4]
+    end
+
+    def get_owner_id_from_security_group
+      security_group = create_random_security_group
+      return nil unless security_group
+      owner_id = random_security_group_owner_id(security_group)
+      delete_random_security_group(security_group)
+      return owner_id
+    end
+
     def create_random_security_group
       security_group = nil
 
