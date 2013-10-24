@@ -257,4 +257,4 @@ EOS
       ]])
     end # it
   end # context ######################################################
-end # default
+end # describe
