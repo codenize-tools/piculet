@@ -6,11 +6,11 @@ module Piculet
     class EC2
       attr_reader :result
 
-      def initialize(vpc, &block)
+      def initialize(vpc, security_groups = [], &block)
         @names = Set.new
         @result = OpenStruct.new({
           :vpc             => vpc,
-          :security_groups => [],
+          :security_groups => security_groups,
         })
 
         instance_eval(&block)
