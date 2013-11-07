@@ -23,7 +23,7 @@ module Piculet
         log(:warn, '`egress any 0.0.0.0/0` is implicitly defined', :yellow) if @options.dry_run && opts[:vpc]
 
         if @options.dry_run
-          sg = OpenStruct.new({:id => '<new security group>', :name => name}.merge(opts))
+          sg = OpenStruct.new({:id => '<new security group>', :name => name, :vpc_id => opts[:vpc]}.merge(opts))
         else
           sg = @security_groups.create(name, opts)
           @options.updated = true

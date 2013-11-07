@@ -78,7 +78,7 @@ module Piculet
             vpc = @security_group.vpc_id || :classic
             name = @security_group.name
 
-            unless @options.ec2.own?(@security_group.owner_id)
+            if @security_group.owner_id and not @options.ec2.own?(@security_group.owner_id)
               name = "#{@security_group.owner_id}/#{name}"
             end
 
