@@ -19,8 +19,10 @@ module Piculet
       AWS.memoize { walk(file) }
     end
 
-    def export
-      exported = AWS.memoize { Exporter.export(@options.ec2) }
+    def export(sg_names = nil)
+      exported = AWS.memoize do
+        Exporter.export(@options.ec2, :sg_names => sg_names)
+      end
 
       if block_given?
         converter = proc do |src|
@@ -75,6 +77,11 @@ module Piculet
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
+
+        if @options.sg_names
+          next unless @options.sg_names.include?(name)
+        end
+
         sg_aws = sg_list_aws[key]
 
         unless sg_aws
@@ -85,16 +92,33 @@ module Piculet
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
+
+        if @options.sg_names
+          next unless @options.sg_names.include?(name)
+        end
+
         sg_aws = sg_list_aws.delete(key)
         walk_security_group(sg_dsl, sg_aws)
       end
 
       sg_list_aws.each do |key, sg_aws|
+        name = key[0]
+
+        if @options.sg_names
+          next unless @options.sg_names.include?(name)
+        end
+
         sg_aws.ingress_ip_permissions.each {|i| i.delete }
         sg_aws.egress_ip_permissions.each {|i| i.delete } if vpc
       end
 
       sg_list_aws.each do |key, sg_aws|
+        name = key[0]
+
+        if @options.sg_names
+          next unless @options.sg_names.include?(name)
+        end
+
         sg_aws.delete
       end
     end

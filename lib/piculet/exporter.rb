@@ -3,19 +3,22 @@ require 'piculet/ext/ip-permission-collection-ext'
 module Piculet
   class Exporter
     class << self
-      def export(ec2)
-        self.new(ec2).export
+      def export(ec2, options = {})
+        self.new(ec2, options).export
       end
     end # of class methods
 
-    def initialize(ec2)
+    def initialize(ec2, options = {})
       @ec2 = ec2
+      @sg_names = options[:sg_names]
     end
 
     def export
       result = {}
+      sgs = @ec2.security_groups
+      sgs = @sg_names.map {|i| sgs[i] } if @sg_names
 
-      @ec2.security_groups.each do |sg|
+      sgs.each do |sg|
         vpc = sg.vpc
         vpc = vpc.id if vpc
         result[vpc] ||= {}
