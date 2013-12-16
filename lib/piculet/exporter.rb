@@ -15,6 +15,7 @@ module Piculet
 
     def export
       result = {}
+      ec2s = @options[:ec2s]
       sg_names = @options[:sg_names]
       sgs = @ec2.security_groups
       sgs = sgs.filter('group-name', *sg_names) if sg_names
@@ -22,6 +23,11 @@ module Piculet
       sgs.each do |sg|
         vpc = sg.vpc
         vpc = vpc.id if vpc
+
+        if ec2s
+          next unless ec2s.any? {|i| (i == 'classic' and vpc.nil?) or i == vpc }
+        end
+
         result[vpc] ||= {}
         result[vpc][sg.id] = export_security_group(sg)
       end
