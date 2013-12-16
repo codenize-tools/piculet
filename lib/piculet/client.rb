@@ -59,6 +59,10 @@ module Piculet
       end
 
       dsl_ec2s.each do |vpc, ec2_dsl|
+        if @options.ec2s
+          next unless @options.ec2s.any? {|i| (i == 'classic' and vpc.nil?) or i == vpc }
+        end
+
         ec2_aws = aws_ec2s[vpc]
 
         if ec2_aws
