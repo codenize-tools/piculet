@@ -19,9 +19,9 @@ module Piculet
       AWS.memoize { walk(file) }
     end
 
-    def export(sg_names = nil)
+    def export(options = {})
       exported = AWS.memoize do
-        Exporter.export(@options.ec2, :sg_names => sg_names)
+        Exporter.export(@options.ec2, options)
       end
 
       if block_given?

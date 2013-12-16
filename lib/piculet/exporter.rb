@@ -10,13 +10,14 @@ module Piculet
 
     def initialize(ec2, options = {})
       @ec2 = ec2
-      @sg_names = options[:sg_names]
+      @options = options
     end
 
     def export
       result = {}
+      sg_names = @options[:sg_names]
       sgs = @ec2.security_groups
-      sgs = sgs.filter('group-name', *@sg_names) if @sg_names
+      sgs = sgs.filter('group-name', *sg_names) if sg_names
 
       sgs.each do |sg|
         vpc = sg.vpc
