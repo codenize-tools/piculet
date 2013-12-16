@@ -16,7 +16,7 @@ module Piculet
     def export
       result = {}
       sgs = @ec2.security_groups
-      sgs = @sg_names.map {|i| sgs[i] } if @sg_names
+      sgs = sgs.filter('group-name', *@sg_names) if @sg_names
 
       sgs.each do |sg|
         vpc = sg.vpc
