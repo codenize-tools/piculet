@@ -26,6 +26,8 @@ ARGV.options do |opt|
     opt.on('-r', '--region REGION')         {|v| region                       = v       }
     opt.on('-a', '--apply')                 {|v| mode                         = :apply  }
     opt.on('-f', '--file FILE')             {|v| file                         = v       }
+    opt.on('-n', '--names SG_LIST', Array)  {|v| options[:sg_names]           = v       }
+    opt.on('',   '--ec2s VPC_IDS', Array)   {|v| options[:ec2s]               = v       }
     opt.on('',   '--dry-run')               {|v| options[:dry_run]            = true    }
     opt.on('-e', '--export')                {|v| mode                         = :export }
     opt.on('-o', '--output FILE')           {|v| output_file                  = v       }
@@ -73,7 +75,7 @@ begin
       output_file = 'Groupfile' if output_file == '-'
       requires = []
 
-      client.export do |exported, converter|
+      client.export(options) do |exported, converter|
         exported.each do |vpc, security_groups|
           group_file = File.join(File.dirname(output_file), "#{vpc || :classic}.group")
           requires << group_file
@@ -96,10 +98,10 @@ begin
     else
       if output_file == '-'
         logger.info('# Export SecurityGroup')
-        puts client.export
+        puts client.export(options)
       else
         logger.info("Export SecurityGroup to `#{output_file}`")
-        open(output_file, 'wb') {|f| f.puts client.export }
+        open(output_file, 'wb') {|f| f.puts client.export(options) }
       end
     end
   when :apply

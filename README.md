@@ -125,6 +125,3 @@ ec2 "vpc-XXXXXXXX" do
   end
 end
 ```
-
-## Link
-* [RubyGems.org site](http://rubygems.org/gems/piculet)
