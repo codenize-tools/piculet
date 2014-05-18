@@ -46,6 +46,8 @@ ARGV.options do |opt|
     elsif (access_key and !secret_key) or (!access_key and secret_key) or mode.nil?
       puts opt.help
       exit 1
+    elsif region
+      AWS.config(:region => region)
     end
   rescue => e
     $stderr.puts("[ERROR] #{e.message}")
