@@ -90,6 +90,11 @@ module Piculet
 
         unless sg_aws
           sg_aws = collection_api.create(name, :vpc => vpc, :description => sg_dsl.description)
+
+          if vpc and sg_dsl.egress.empty?
+            log(:warn, '`egress any 0.0.0.0/0` is implicitly defined', :yellow)
+          end
+
           sg_list_aws[key] = sg_aws
         end
       end
