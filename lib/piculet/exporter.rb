@@ -19,6 +19,7 @@ module Piculet
       sg_names = @options[:sg_names]
       sgs = @ec2.security_groups
       sgs = sgs.filter('group-name', *sg_names) if sg_names
+      sgs = sgs.sort_by {|sg| sg.name }
 
       sgs.each do |sg|
         vpc = sg.vpc
@@ -49,19 +50,23 @@ module Piculet
     def export_ip_permissions(ip_permissions)
       ip_permissions = ip_permissions ? ip_permissions.aggregate : []
 
-      ip_permissions.map do |ip_perm|
+      ip_permissions = ip_permissions.map do |ip_perm|
         {
           :protocol   => ip_perm.protocol,
           :port_range => ip_perm.port_range,
-          :ip_ranges  => ip_perm.ip_ranges,
+          :ip_ranges  => ip_perm.ip_ranges.sort,
           :groups => ip_perm.groups.map {|group|
             {
               :id       => group.id,
               :name     => group.name,
               :owner_id => group.owner_id,
             }
-          },
+          }.sort_by {|g| g[:name] },
         }
+      end
+
+      ip_permissions.sort_by do |ip_perm|
+        [ip_perm[:protocol], (ip_perm[:port_range].first.to_i rescue nil)]
       end
     end
   end # Exporter
