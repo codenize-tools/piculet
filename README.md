@@ -5,7 +5,7 @@ Piculet is a tool to manage EC2 Security Group.
 It defines the state of EC2 Security Group using DSL, and updates EC2 Security Group according to DSL.
 
 [![Gem Version](https://badge.fury.io/rb/piculet.png)](http://badge.fury.io/rb/piculet)
-[![Build Status](https://drone.io/bitbucket.org/winebarrel/piculet/status.png)](https://drone.io/bitbucket.org/winebarrel/piculet/latest)
+[![Build Status](https://travis-ci.org/winebarrel/piculet.svg?branch=master)](https://travis-ci.org/winebarrel/piculet)
 
 ## Installation
 
