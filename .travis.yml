@@ -1,0 +1,14 @@
+language: ruby
+rvm:
+- 2.0.0
+script:
+- bundle install
+- bundle exec rake
+env:
+  global:
+  - TEST_AWS_REGION=ap-northeast-1
+  - TEST_VPC_ID=vpc-4f803c27
+  - TEST_OWNER_ID=003530583122
+  - TEST_EXPORT_DELAY=1
+  - secure: FN+yewcF3x4QWI59Uszj2mCxcz59Yq7Vlt+R+YNPtqMYkQ7Iqg5Sxdb/fGslHrLwu9L48StLBTMQ3PAmPcZ+PNykZPHdrn0TENeomcIP/wskJZ+gI2R0YqDphpCOPZ9wBXtjuprRZFg+50P+b7+v25kG9ikn+lC+D7LJjGnuVxM=
+  - secure: E28xS2ILCfdjjBdML0wKNtv2uCWFXQuvx6Fdc77Q27GulaH7DAsTAh2UEbT7IHO2cvjnD9x8KcsxGOibxsvG/JYOw9qpv/GyBCqLJsqG6SE4p6uPTmrmH+lcTVdCH/VfAMiqHApeUQR3OY6z3cfKwmIfXXO2bPUD3CQ6aX7rmxI=
