@@ -66,7 +66,8 @@ module Piculet
       end
 
       ip_permissions.sort_by do |ip_perm|
-        [ip_perm[:protocol], (ip_perm[:port_range].first.to_i rescue nil)]
+        port_range = ip_perm[:port_range] || (0..0)
+        [ip_perm[:protocol], port_range.first, port_range.last]
       end
     end
   end # Exporter
