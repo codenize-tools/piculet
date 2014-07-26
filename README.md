@@ -36,6 +36,24 @@ piculet -a --dry-run
 piculet -a               # apply `Groupfile` to EC2 SecurityGroup
 ```
 
+## Help
+```
+Usage: piculet [options]
+    -k, --access-key ACCESS_KEY
+    -s, --secret-key SECRET_KEY
+    -r, --region REGION
+    -a, --apply
+    -f, --file FILE
+    -n, --names SG_LIST
+        --ec2s VPC_IDS
+        --dry-run
+    -e, --export
+    -o, --output FILE
+        --split
+        --no-color
+        --debug
+```
+
 ## Groupfile example
 
 ```ruby
