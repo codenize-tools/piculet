@@ -39,6 +39,7 @@ piculet -a               # apply `Groupfile` to EC2 SecurityGroup
 ## Help
 ```
 Usage: piculet [options]
+    -p, --profile PROFILE_NAME
     -k, --access-key ACCESS_KEY
     -s, --secret-key SECRET_KEY
     -r, --region REGION
