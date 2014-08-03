@@ -1,7 +1,3 @@
-require 'piculet/logger'
-require 'piculet/ext/ip-permission-collection-ext'
-require 'piculet/wrapper/permission'
-
 module Piculet
   class EC2Wrapper
     class SecurityGroupCollection

@@ -1,5 +1,3 @@
-require 'ostruct'
-
 module Piculet
   class DSL
     class EC2
@@ -42,7 +40,7 @@ module Piculet
 
               @result.ip_ranges = values
             end
- 
+
             def groups(*values)
               if values.empty?
                 raise ArgumentError, "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `groups`: wrong number of arguments (0 for 1..)"

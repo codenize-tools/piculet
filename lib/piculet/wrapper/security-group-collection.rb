@@ -1,7 +1,3 @@
-require 'ostruct'
-require 'piculet/logger'
-require 'piculet/wrapper/security-group'
-
 module Piculet
   class EC2Wrapper
     class SecurityGroupCollection

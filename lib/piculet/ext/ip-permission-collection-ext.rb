@@ -1,6 +1,3 @@
-require 'aws-sdk'
-require 'ostruct'
-
 module AWS
   class EC2
     class SecurityGroup

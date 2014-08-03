@@ -1,5 +1,3 @@
-require 'term/ansicolor'
-
 class String
   @@colorize = false
 

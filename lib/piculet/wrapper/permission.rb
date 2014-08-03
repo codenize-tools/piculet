@@ -1,6 +1,3 @@
-require 'forwardable'
-require 'piculet/logger'
-
 module Piculet
   class EC2Wrapper
     class SecurityGroupCollection
