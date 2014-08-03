@@ -8,6 +8,7 @@ require 'term/ansicolor'
 require 'aws-sdk'
 
 require 'piculet/ext/ec2-owner-id-ext'
+require 'piculet/ext/security-group'
 require 'piculet/ext/ip-permission-collection-ext'
 require 'piculet/ext/string-ext'
 
