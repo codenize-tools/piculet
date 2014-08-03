@@ -1,6 +1,3 @@
-require 'set'
-require 'piculet/dsl/security-group'
-
 module Piculet
   class DSL
     class EC2

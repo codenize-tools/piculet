@@ -1,7 +1,3 @@
-require 'logger'
-require 'singleton'
-require 'piculet/ext/string-ext'
-
 module Piculet
   class Logger < ::Logger
     include Singleton

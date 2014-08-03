@@ -1,10 +1,3 @@
-require 'aws-sdk'
-require 'piculet/dsl'
-require 'piculet/exporter'
-require 'piculet/ext/ec2-owner-id-ext'
-require 'piculet/wrapper/ec2-wrapper'
-require 'piculet/logger'
-
 module Piculet
   class Client
     include Logger::ClientHelper

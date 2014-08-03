@@ -1,5 +1,3 @@
-require 'aws-sdk'
-
 module AWS
   class EC2
     DESC_OWNER_ID_RETRY_TIMES   = 3

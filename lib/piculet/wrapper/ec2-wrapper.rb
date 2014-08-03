@@ -1,5 +1,3 @@
-require 'piculet/wrapper/security-group-collection'
-
 module Piculet
   class EC2Wrapper
     def initialize(ec2, options)

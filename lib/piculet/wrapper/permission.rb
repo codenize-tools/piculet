@@ -1,6 +1,3 @@
-require 'forwardable'
-require 'piculet/logger'
-
 module Piculet
   class EC2Wrapper
     class SecurityGroupCollection
@@ -68,7 +65,13 @@ module Piculet
             def normalize_attrs(dsl)
               dsl_ip_ranges = (dsl.ip_ranges || []).sort
               dsl_groups = (dsl.groups || []).map {|i|
-                i.kind_of?(Array) ? i : [@options.ec2.owner_id, i]
+                if i.kind_of?(Array)
+                  i
+                elsif AWS::EC2::SecurityGroup.elb?(i)
+                  [AWS::EC2::SecurityGroup::ELB_OWNER, AWS::EC2::SecurityGroup::ELB_NAME]
+                else
+                  [@options.ec2.owner_id, i]
+                end
               }.sort
 
               self_ip_ranges, self_groups = normalize_self_attrs

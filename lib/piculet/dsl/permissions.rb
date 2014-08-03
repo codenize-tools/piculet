@@ -1,6 +1,3 @@
-require 'ostruct'
-require 'piculet/dsl/permission'
-
 module Piculet
   class DSL
     class EC2

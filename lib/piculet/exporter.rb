@@ -1,5 +1,3 @@
-require 'piculet/ext/ip-permission-collection-ext'
-
 module Piculet
   class Exporter
     class << self

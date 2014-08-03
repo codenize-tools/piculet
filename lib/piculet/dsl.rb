@@ -1,7 +1,3 @@
-require 'ostruct'
-require 'piculet/dsl/ec2'
-require 'piculet/dsl/converter'
-
 module Piculet
   class DSL
     class << self
