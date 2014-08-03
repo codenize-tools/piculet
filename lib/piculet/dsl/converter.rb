@@ -79,7 +79,7 @@ end
         ].select {|i| i }.join.strip
 
         ip_ranges_groups.insert(0, "\n        ") unless ip_ranges_groups.empty?
-        
+
         <<-EOS
       permission #{args}do#{
         ip_ranges_groups}
@@ -105,7 +105,14 @@ end
           name_or_id = i[:name] || i[:id]
           owner_id = i[:owner_id]
 
-          arg = @owner_id == owner_id ? name_or_id : [owner_id, i[:id]]
+          if AWS::EC2::SecurityGroup.elb?(owner_id)
+            arg = AWS::EC2::SecurityGroup.elb_sg
+          elsif @owner_id == owner_id
+            arg = name_or_id
+          else
+            arg = [owner_id, i[:id]]
+          end
+
           arg.inspect
         }.join(",\n          ")
 
