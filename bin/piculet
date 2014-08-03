@@ -4,6 +4,8 @@ require 'rubygems'
 require 'piculet'
 require 'optparse'
 
+Version = Piculet::VERSION
+
 mode = nil
 file = 'Groupfile'
 output_file = '-'
