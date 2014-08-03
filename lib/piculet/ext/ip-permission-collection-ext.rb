@@ -28,7 +28,6 @@ module AWS
               sleep DESC_SECURITY_GROUP_RETRY_WAIT
             end
           end
-          
 
           aggregated.map do |key, attrs|
             protocol, port_range = key
