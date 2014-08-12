@@ -62,7 +62,7 @@ require 'other/groupfile'
 
 ec2 do
   security_group "default" do
-    description "default group"
+    description "default group for EC2 Classic"
 
     ingress do
       permission :tcp, 0..65535 do
