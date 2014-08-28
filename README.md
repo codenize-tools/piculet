@@ -114,6 +114,12 @@ ec2 "vpc-XXXXXXXX" do
           "0.0.0.0/0"
         )
       end
+      # ESP (IP Protocol number: 50)
+      permission :"50" do
+        ip_ranges(
+          "0.0.0.0/0"
+        )
+      end
       permission :any do
         groups(
           "any_other_group",
