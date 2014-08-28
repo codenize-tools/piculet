@@ -1,10 +1,3 @@
-$: << File.expand_path("#{File.dirname __FILE__}/../lib")
-$: << File.expand_path("#{File.dirname __FILE__}/../spec")
-
-require 'rubygems'
-require 'piculet'
-require 'spec_helper'
-
 describe Piculet::Client do
   before(:each) {
     groupfile { (<<EOS)
@@ -31,7 +24,7 @@ EOS
   end
 
   [:ingress, :egress].each do |direction|
-    [[:tcp, 80..81], [:udp, 53..54], [:any, nil], [:icmp, -1..-1]].each do |protocol, port_range|
+    [[:tcp, 80..81], [:udp, 53..54], [:any, nil], [:icmp, -1..-1], [:"50", nil]].each do |protocol, port_range|
       context "update #{protocol} #{direction} permission allow from ip ranges and groups" do #
         before do
           groupfile { (<<EOS)

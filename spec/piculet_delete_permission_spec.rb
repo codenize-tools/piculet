@@ -1,10 +1,3 @@
-$: << File.expand_path("#{File.dirname __FILE__}/../lib")
-$: << File.expand_path("#{File.dirname __FILE__}/../spec")
-
-require 'rubygems'
-require 'piculet'
-require 'spec_helper'
-
 describe Piculet::Client do
   before(:each) {
     groupfile { (<<EOS)

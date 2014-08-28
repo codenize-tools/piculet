@@ -1,4 +1,6 @@
+require 'rubygems'
 require 'aws-sdk'
+require 'piculet'
 
 TEST_VPC_ID = ENV['TEST_VPC_ID']
 TEST_OWNER_ID = ENV['TEST_OWNER_ID']
