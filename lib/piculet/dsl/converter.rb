@@ -35,6 +35,15 @@ end
       def output_security_group(security_group_id, security_group)
         name = security_group[:name].inspect
         description = security_group[:description].inspect
+        tags = ''
+
+        unless security_group[:tags].empty?
+          tags = "\n\n    tags(\n      " +
+                 security_group[:tags].map {|k, v|
+                   k.inspect + ' => ' + v.inspect
+                 }.join(",\n      ") +
+                 "\n    )"
+        end
 
         ingress = security_group.fetch(:ingress, [])
         egress = security_group.fetch(:egress, [])
@@ -49,6 +58,7 @@ end
         <<-EOS
   security_group #{name} do
     description #{description}#{
+    tags}#{
     ingress_egress}
   end
         EOS

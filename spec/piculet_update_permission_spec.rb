@@ -108,12 +108,14 @@ EOS
             [:ingress     , EMPTY_ARRAY],
             [:name        , "any_other_security_group"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ],[
             [:description , "default VPC security group"],
             [:egress      , egress_value],
             [:ingress     , ingress_value],
             [:name        , "default"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ]])
         end # it
       end # context ##################################################

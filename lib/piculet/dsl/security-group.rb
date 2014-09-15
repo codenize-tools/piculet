@@ -8,6 +8,7 @@ module Piculet
 
           @result = OpenStruct.new({
             :name    => name,
+            :tags    => {},
             :ingress => [],
             :egress  => [],
           })
@@ -26,6 +27,19 @@ module Piculet
         private
         def description(value)
           @result.description = value
+        end
+
+        def tags(values)
+          if @tags_is_defined
+            raise "SecurityGroup `#{@name}`: `tags` is already defined"
+          end
+
+          unless values.kind_of?(Hash)
+            raise "SecurityGroup `#{@name}`: argument of `tags` is wrong (expected Hash)"
+          end
+
+          @result.tags = values
+          @tags_is_defined = true
         end
 
         def ingress(&block)
