@@ -39,6 +39,7 @@ module Piculet
       {
         :name        => security_group.name,
         :description => security_group.description,
+        :tags        => tags_to_hash(security_group.tags),
         :owner_id    => security_group.owner_id,
         :ingress     => export_ip_permissions(security_group.ingress_ip_permissions),
         :egress      => export_ip_permissions(security_group.egress_ip_permissions),
@@ -67,6 +68,12 @@ module Piculet
         port_range = ip_perm[:port_range] || (0..0)
         [ip_perm[:protocol], port_range.first, port_range.last]
       end
+    end
+
+    def tags_to_hash(tags)
+      h = {}
+      tags.map {|k, v| h[k] = v }
+      h
     end
   end # Exporter
 end # Piculet
