@@ -65,6 +65,11 @@ ec2 do
   security_group "default" do
     description "default group for EC2 Classic"
 
+    tags(
+      "key1" => "value1",
+      "key2" => "value2"
+    )
+
     ingress do
       permission :tcp, 0..65535 do
         groups(
@@ -98,6 +103,11 @@ end
 ec2 "vpc-XXXXXXXX" do
   security_group "default" do
     description "default VPC security group"
+
+    tags(
+      "key1" => "value1",
+      "key2" => "value2"
+    )
 
     ingress do
       permission :tcp, 22..22 do
@@ -140,6 +150,11 @@ ec2 "vpc-XXXXXXXX" do
 
   security_group "any_other_group" do
     description "any_other_group"
+
+    tags(
+      "key1" => "value1",
+      "key2" => "value2"
+    )
 
     egress do
       permission :any do
