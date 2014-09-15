@@ -72,6 +72,7 @@ EOS
             [:ingress     , ingress_value],
             [:name        , "default"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ]])
         end # it
       end # context ##################################################
@@ -130,12 +131,14 @@ EOS
             [:ingress     , EMPTY_ARRAY],
             [:name        , "any_other_security_group"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ],[
             [:description , "default VPC security group"],
             [:egress      , egress_value],
             [:ingress     , ingress_value],
             [:name        , "default"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ]])
         end # it
       end # context ##################################################
@@ -211,12 +214,14 @@ EOS
             [:ingress     , EMPTY_ARRAY],
             [:name        , "any_other_security_group"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ],[
             [:description , "default VPC security group"],
             [:egress      , egress_value],
             [:ingress     , ingress_value],
             [:name        , "default"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ]])
         end # it
       end # context ##################################################
@@ -279,12 +284,14 @@ EOS
             [:ingress     , EMPTY_ARRAY],
             [:name        , "any_other_security_group"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ],[
             [:description , "default VPC security group"],
             [:egress      , egress_value],
             [:ingress     , ingress_value],
             [:name        , "default"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ]])
         end # it
       end # context ##################################################
@@ -367,18 +374,21 @@ EOS
           [:ingress     , EMPTY_ARRAY],
           [:name        , "default"],
           [:owner_id    , TEST_OWNER_ID],
+          [:tags        , {}],
         ],[
           [:description , "security group A"],
           [:egress      , egress_value.call('security_group_b')],
           [:ingress     , ingress_value.call('security_group_b')],
           [:name        , "security_group_a"],
           [:owner_id    , TEST_OWNER_ID],
+          [:tags        , {}],
         ],[
           [:description , "security group B"],
           [:egress      , egress_value.call('security_group_a')],
           [:ingress     , ingress_value.call('security_group_a')],
           [:name        , "security_group_b"],
           [:owner_id    , TEST_OWNER_ID],
+          [:tags        , {}],
         ]])
       end # it
     end # context ##################################################

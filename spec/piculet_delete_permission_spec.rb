@@ -77,12 +77,14 @@ EOS
             [:ingress     , EMPTY_ARRAY],
             [:name        , "any_other_security_group"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ],[
             [:description , "default VPC security group"],
             [:egress      , EMPTY_ARRAY],
             [:ingress     , EMPTY_ARRAY],
             [:name        , "default"],
             [:owner_id    , TEST_OWNER_ID],
+            [:tags        , {}],
           ]])
         end # it
       end # context ##################################################
@@ -143,6 +145,7 @@ EOS
           [:ingress     , EMPTY_ARRAY],
           [:name        , "default"],
           [:owner_id    , TEST_OWNER_ID],
+          [:tags        , {}],
         ]])
       end # it
     end # context ##################################################
