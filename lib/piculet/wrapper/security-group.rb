@@ -15,15 +15,18 @@ module Piculet
         end
 
         def eql?(dsl)
-          @security_group.description == dsl.description
+          description_eql?(dsl) and tags_eql?(dsl)
         end
 
         def update(dsl)
-          if @security_group.description != dsl.description
+          unless description_eql?(dsl)
             log(:warn, '`description` cannot be updated', :yellow, "#{vpc_id || :classic} > #{name}")
           end
 
-          # XXX:
+          unless tags_eql?(dsl)
+            log(:info, 'Update SecurityGroup', :green, "#{vpc_id || :classic} > #{name}")
+            update_tags(dsl)
+          end
         end
 
         def delete
@@ -39,12 +42,56 @@ module Piculet
           end
         end
 
+        def tags
+          h = {}
+          @security_group.tags.map {|k, v| h[k] = v }
+          h
+        end
+
         def ingress_ip_permissions
           PermissionCollection.new(@security_group, :ingress, @options)
         end
 
         def egress_ip_permissions
           PermissionCollection.new(@security_group, :egress, @options)
+        end
+
+        private
+        def description_eql?(dsl)
+          @security_group.description == dsl.description
+        end
+
+        def tags_eql?(dsl)
+          self_tags = normalize_tags(self.tags)
+          dsl_tags = normalize_tags(dsl.tags)
+          self_tags == dsl_tags
+        end
+
+        def update_tags(dsl)
+          self_tags = normalize_tags(self.tags)
+          dsl_tags = normalize_tags(dsl.tags)
+
+          log(:info, "  set tags=#{dsl_tags.inspect}" , :green)
+
+          unless @options.dry_run
+            if dsl_tags.empty?
+              @security_group.tags.clear
+            else
+              delete_keys = self_tags.keys - dsl_tags.keys
+              # XXX: `delete` method does not remove the tag. It's seems a bug in the API
+              #@security_group.tags.delete(delete_keys) unless delete_keys.empty?
+              @security_group.tags.clear unless delete_keys.empty?
+              @security_group.tags.set(dsl_tags)
+            end
+
+            @options.updated = true
+          end
+        end
+
+        def normalize_tags(src)
+          normalized = {}
+          src.map {|k, v| normalized[k.to_s] = v.to_s }
+          normalized
         end
       end # SecurityGroup
     end # SecurityGroupCollection
