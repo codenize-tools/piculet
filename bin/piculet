@@ -10,6 +10,7 @@ mode = nil
 file = 'Groupfile'
 output_file = '-'
 split = false
+modeline = "# -*- mode: ruby -*-# vi: set ft=ruby :\n\n"
 
 options = {
   :dry_run     => false,
@@ -112,7 +113,8 @@ begin
         puts client.export(options)
       else
         logger.info("Export SecurityGroup to `#{output_file}`")
-        open(output_file, 'wb') {|f| f.puts client.export(options) }
+        output_content = modeline + client.export(options)
+        open(output_file, 'wb') {|f| f.puts output_content }
       end
     end
   when :apply
