@@ -4,6 +4,7 @@ module Piculet
 
     def initialize(options = {})
       @options = OpenStruct.new(options)
+      @options_hash = options
       @options.ec2 = AWS::EC2.new
     end
 
@@ -14,7 +15,7 @@ module Piculet
 
     def export(options = {})
       exported = AWS.memoize do
-        Exporter.export(@options.ec2, options)
+        Exporter.export(@options.ec2, @options_hash.merge(options))
       end
 
       if block_given?

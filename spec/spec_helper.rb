@@ -19,7 +19,10 @@ def groupfile(options = {})
 
   begin
     open(tempfile, 'wb') {|f| f.puts(yield) }
-    options = {:logger => Logger.new('/dev/null')}.merge(options)
+    options = {
+      :logger => Logger.new('/dev/null'),
+      :ec2s => [TEST_VPC_ID],
+    }.merge(options)
 
     if options[:debug]
       AWS.config({
@@ -46,7 +49,10 @@ def groupfile(options = {})
 end
 
 def export_security_groups(options = {})
-  options = {:logger => Logger.new('/dev/null')}.merge(options)
+  options = {
+    :logger => Logger.new('/dev/null'),
+    :ec2s => [TEST_VPC_ID],
+  }.merge(options)
 
   if options[:debug]
     AWS.config({
