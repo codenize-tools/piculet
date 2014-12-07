@@ -10,7 +10,10 @@ mode = nil
 file = 'Groupfile'
 output_file = '-'
 split = false
-modeline = "# -*- mode: ruby -*-# vi: set ft=ruby :\n\n"
+MAGIC_COMMENT = <<-EOS
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+EOS
 
 options = {
   :dry_run     => false,
@@ -98,6 +101,7 @@ begin
           logger.info("  write `#{group_file}`")
 
           open(group_file, 'wb') do |f|
+            f.puts MAGIC_COMMENT
             f.puts converter.call(vpc => security_groups)
           end
         end
@@ -106,6 +110,8 @@ begin
       logger.info("  write `#{output_file}`")
 
       open(output_file, 'wb') do |f|
+        f.puts MAGIC_COMMENT
+
         requires.each do |group_file|
           f.puts "require '#{File.basename group_file}'"
         end
@@ -116,8 +122,11 @@ begin
         puts client.export(options)
       else
         logger.info("Export SecurityGroup to `#{output_file}`")
-        output_content = modeline + client.export(options)
-        open(output_file, 'wb') {|f| f.puts output_content }
+
+        open(output_file, 'wb') do |f|
+          f.puts MAGIC_COMMENT
+          f.puts client.export(options)
+        end
       end
     end
   when :apply
