@@ -68,8 +68,10 @@ ARGV.options do |opt|
     AWS.config(aws_opts)
     
     # Remap groups to exclude to regular expressions (if they're surrounded by '/')
-    options[:exclude_sgs].map! do |name|
-      name =~ /^\/(.*)\/$/ ? Regexp.new($1) : Regexp.new("^#{name}$")
+    if options[:exclude_sgs]
+      options[:exclude_sgs].map! do |name|
+        name =~ /^\/(.*)\/$/ ? Regexp.new($1) : Regexp.new("^#{name}$")
+      end
     end
     
   rescue => e
