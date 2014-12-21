@@ -79,7 +79,7 @@ module Piculet
         if @options.sg_names
           next unless @options.sg_names.include?(name)
         end
-        
+
         if @options.exclude_sgs
           next if @options.exclude_sgs.any? {|regex| name =~ regex}
         end
@@ -103,7 +103,7 @@ module Piculet
         if @options.sg_names
           next unless @options.sg_names.include?(name)
         end
-        
+
         if @options.exclude_sgs
           next if @options.exclude_sgs.any? {|regex| name =~ regex}
         end
@@ -118,7 +118,7 @@ module Piculet
         if @options.sg_names
           next unless @options.sg_names.include?(name)
         end
-        
+
         if @options.exclude_sgs
           next if @options.exclude_sgs.any? {|regex| name =~ regex}
         end
@@ -133,7 +133,7 @@ module Piculet
         if @options.sg_names
           next unless @options.sg_names.include?(name)
         end
-        
+
         if @options.exclude_sgs
           next if @options.exclude_sgs.any? {|regex| name =~ regex}
         end
