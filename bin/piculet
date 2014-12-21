@@ -66,14 +66,14 @@ ARGV.options do |opt|
 
     aws_opts[:region] = region if region
     AWS.config(aws_opts)
-    
+
     # Remap groups to exclude to regular expressions (if they're surrounded by '/')
     if options[:exclude_sgs]
       options[:exclude_sgs].map! do |name|
-        name =~ /^\/(.*)\/$/ ? Regexp.new($1) : Regexp.new("^#{name}$")
+        name =~ /\A\/(.*)\/\z/ ? Regexp.new($1) : Regexp.new("\A#{Regexp.escape(name)}\z")
       end
     end
-    
+
   rescue => e
     $stderr.puts("[ERROR] #{e.message}")
     exit 1
