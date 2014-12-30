@@ -3,6 +3,7 @@ module Piculet
     class EC2
       class SecurityGroup
         class Permissions
+          include Logger::ClientHelper
           def initialize(security_group, direction, &block)
             @security_group = security_group
             @direction = direction
@@ -34,6 +35,7 @@ module Piculet
 
             if @result.has_key?(key)
               @result[key] = OpenStruct.new(@result[key].marshal_dump.merge(res.marshal_dump) {|key,old,new|
+                log(:warn, "SecurityGroup `#{@security_group}`: #{@direction}: #{protocol}: #{port_range}: #{key}: #{old & new} are duplicated", :yellow) if (old & new).any?
                 old|new
               })
 	    else
