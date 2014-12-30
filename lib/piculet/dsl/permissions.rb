@@ -30,12 +30,15 @@ module Piculet
             end
 
             key = [protocol, port_range]
+            res = Permission.new(@security_group, @direction, key, &block).result
 
             if @result.has_key?(key)
-              raise "SecurityGroup `#{@security_group}`: #{@direction}: #{key} is already defined"
+              @result[key] = OpenStruct.new(@result[key].marshal_dump.merge(res.marshal_dump) {|key,old,new|
+                old|new
+              })
+	    else
+              @result[key] = res
             end
-
-            @result[key] = Permission.new(@security_group, @direction, key, &block).result
           end
         end # Permissions
       end # SecurityGroup
