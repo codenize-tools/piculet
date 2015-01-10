@@ -3,6 +3,7 @@ module Piculet
     class EC2
       class SecurityGroup
         class Permissions
+          include Logger::ClientHelper
           def initialize(security_group, direction, &block)
             @security_group = security_group
             @direction = direction
@@ -30,12 +31,16 @@ module Piculet
             end
 
             key = [protocol, port_range]
+            res = Permission.new(@security_group, @direction, key, &block).result
 
             if @result.has_key?(key)
-              raise "SecurityGroup `#{@security_group}`: #{@direction}: #{key} is already defined"
+              @result[key] = OpenStruct.new(@result[key].marshal_dump.merge(res.marshal_dump) {|key,old,new|
+                log(:warn, "SecurityGroup `#{@security_group}`: #{@direction}: #{protocol}: #{port_range}: #{key}: #{old & new} are duplicated", :yellow) if (old & new).any?
+                old|new
+              })
+	    else
+              @result[key] = res
             end
-
-            @result[key] = Permission.new(@security_group, @direction, key, &block).result
           end
         end # Permissions
       end # SecurityGroup
