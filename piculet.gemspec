@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["sgwr_dts@yahoo.co.jp"]
   spec.description   = "Piculet is a tool to manage EC2 Security Group. It defines the state of EC2 Security Group using DSL, and updates EC2 Security Group according to DSL."
   spec.summary       = "Piculet is a tool to manage EC2 Security Group."
-  spec.homepage      = "https://github.com/winebarrel/piculet"
+  spec.homepage      = "http://piculet.codenize.tools/"
   spec.license       = "MIT"
   spec.files         = %w(README.md) + Dir.glob('bin/**/*') + Dir.glob('lib/**/*')
 
