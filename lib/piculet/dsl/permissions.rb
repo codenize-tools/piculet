@@ -4,6 +4,7 @@ module Piculet
       class SecurityGroup
         class Permissions
           include Logger::ClientHelper
+
           def initialize(security_group, direction, &block)
             @security_group = security_group
             @direction = direction
@@ -34,11 +35,14 @@ module Piculet
             res = Permission.new(@security_group, @direction, key, &block).result
 
             if @result.has_key?(key)
-              @result[key] = OpenStruct.new(@result[key].marshal_dump.merge(res.marshal_dump) {|key,old,new|
-                log(:warn, "SecurityGroup `#{@security_group}`: #{@direction}: #{protocol}: #{port_range}: #{key}: #{old & new} are duplicated", :yellow) if (old & new).any?
-                old|new
+              @result[key] = OpenStruct.new(@result[key].marshal_dump.merge(res.marshal_dump) {|hash_key, old_val, new_val|
+                if (duplicated = old_val & new_val).any?
+                  log(:warn, "SecurityGroup `#{@security_group}`: #{@direction}: #{key}: #{hash_key}: #{duplicated} are duplicated", :yellow)
+                end
+
+                old_val | new_val
               })
-	    else
+            else
               @result[key] = res
             end
           end
