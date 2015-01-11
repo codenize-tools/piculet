@@ -1,0 +1,12 @@
+# Site settings
+title: Piculet
+email: sgwr_dts@yahoo.co.jp
+description: "Piculet is a tool to manage EC2 Security Group. It defines the state of EC2 Security Group using DSL, and updates EC2 Security Group according to DSL."
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://piculet.codenize.tools/"
+github_url: "https://github.com/winebarrel/piculet"
+twitter_username: sgwr_dts
+github_username:  winebarrel
+
+# Build settings
+markdown: kramdown
