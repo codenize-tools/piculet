@@ -51,7 +51,7 @@ Theme Styles
 body {
   box-sizing: border-box;
   color:#373737;
-  background: url('../images/background.jpg') repeat;
+  background: url('../images/background.jpg?201501121030') repeat;
   font-size: 16px;
   font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -369,7 +369,9 @@ Full-Width Styles
   background: #212121;
 }
 
-
+.text_shadow {
+  text-shadow: 1px 1px 3px #000;
+}
 
 /*******************************************************************************
 Small Device Styles
