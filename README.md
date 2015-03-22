@@ -240,7 +240,7 @@ end
 
 ### Apply
 
-    $ piculet --apply --format=json -o Groupfile.json
+    $ piculet --apply --format=json -f Groupfile.json
 
 ## Similar tools
 * [Codenize.tools](http://codenize.tools/)
