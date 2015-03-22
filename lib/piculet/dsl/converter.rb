@@ -20,7 +20,7 @@ module Piculet
 
       private
       def output_ec2(vpc, security_groups)
-        vpc = vpc ? vpc.inspect + ' ' : ''
+        vpc = vpc ? vpc.to_s.inspect + ' ' : ''
         security_groups = security_groups.map {|sg_id, sg|
           output_security_group(sg_id, sg)
         }.join("\n").strip
@@ -76,8 +76,9 @@ end
       end
 
       def output_perm(permission)
-        protocol = permission[:protocol]
+        protocol = permission[:protocol].to_sym
         port_range = permission[:port_range]
+        port_range = eval(port_range) if port_range.kind_of?(String)
         args = [protocol, port_range].select {|i| i }.map {|i| i.inspect }.join(', ') + ' '
 
         ip_ranges = permission.fetch(:ip_ranges, [])

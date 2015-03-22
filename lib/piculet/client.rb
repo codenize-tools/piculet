@@ -37,13 +37,31 @@ module Piculet
     def load_file(file)
       if file.kind_of?(String)
         open(file) do |f|
-          DSL.define(f.read, file).result
+          load_by_format(f.read, file)
         end
       elsif file.respond_to?(:read)
-        DSL.define(file.read, file.path).result
+        load_by_format(file.read, file.path)
       else
         raise TypeError, "can't convert #{file} into File"
       end
+    end
+
+    def load_by_format(src, path)
+      if @options.format == :json
+        src = load_json(src, path)
+      end
+
+      DSL.define(src, path).result
+    end
+
+    def load_json(json, path)
+      json = JSON.parse(json, :symbolize_names => true)
+
+      if json.has_key?(:'')
+        json[nil] = json.delete(:'')
+      end
+
+      DSL.convert(json, @options.ec2.owner_id)
     end
 
     def walk(file)
