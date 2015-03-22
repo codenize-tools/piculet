@@ -17,6 +17,7 @@ EOS
 
 options = {
   :dry_run     => false,
+  :format      => :json,
   :color       => true,
   :debug       => false,
 }
@@ -29,22 +30,23 @@ ARGV.options do |opt|
     profile_name = nil
     credentials_path = nil
 
-    opt.on('-p', '--profile PROFILE_NAME')   {|v| profile_name                 = v       }
-    opt.on(''  , '--credentials-path PATH')  {|v| credentials_path             = v       }
-    opt.on('-k', '--access-key ACCESS_KEY')  {|v| access_key                   = v       }
-    opt.on('-s', '--secret-key SECRET_KEY')  {|v| secret_key                   = v       }
-    opt.on('-r', '--region REGION')          {|v| region                       = v       }
-    opt.on('-a', '--apply')                  {|v| mode                         = :apply  }
-    opt.on('-f', '--file FILE')              {|v| file                         = v       }
-    opt.on('-n', '--names SG_LIST', Array)   {|v| options[:sg_names]           = v       }
-    opt.on('-x', '--exclude SG_LIST', Array) {|v| options[:exclude_sgs]        = v       }
-    opt.on('',   '--ec2s VPC_IDS', Array)    {|v| options[:ec2s]               = v       }
-    opt.on('',   '--dry-run')                {|v| options[:dry_run]            = true    }
-    opt.on('-e', '--export')                 {|v| mode                         = :export }
-    opt.on('-o', '--output FILE')            {|v| output_file                  = v       }
-    opt.on('',   '--split')                  {|v| split                        = true    }
-    opt.on(''  , '--no-color')               {    options[:color]              = false   }
-    opt.on(''  , '--debug')                  {    options[:debug]              = true    }
+    opt.on('-p', '--profile PROFILE_NAME')          {|v| profile_name                 = v       }
+    opt.on(''  , '--credentials-path PATH')         {|v| credentials_path             = v       }
+    opt.on('-k', '--access-key ACCESS_KEY')         {|v| access_key                   = v       }
+    opt.on('-s', '--secret-key SECRET_KEY')         {|v| secret_key                   = v       }
+    opt.on('-r', '--region REGION')                 {|v| region                       = v       }
+    opt.on('-a', '--apply')                         {|v| mode                         = :apply  }
+    opt.on('-f', '--file FILE')                     {|v| file                         = v       }
+    opt.on('-n', '--names SG_LIST', Array)          {|v| options[:sg_names]           = v       }
+    opt.on('-x', '--exclude SG_LIST', Array)        {|v| options[:exclude_sgs]        = v       }
+    opt.on('',   '--ec2s VPC_IDS', Array)           {|v| options[:ec2s]               = v       }
+    opt.on('',   '--dry-run')                       {|v| options[:dry_run]            = true    }
+    opt.on('-e', '--export')                        {|v| mode                         = :export }
+    opt.on('-o', '--output FILE')                   {|v| output_file                  = v       }
+    opt.on('',   '--split')                         {|v| split                        = true    }
+    opt.on('',   '--format=FORMAT', [:ruby, :json]) {|v| options[:format]             = v       }
+    opt.on(''  , '--no-color')                      {    options[:color]              = false   }
+    opt.on(''  , '--debug')                         {    options[:debug]              = true    }
     opt.parse!
 
     aws_opts = {}
@@ -102,39 +104,56 @@ begin
       output_file = 'Groupfile' if output_file == '-'
       requires = []
 
-      client.export(options) do |exported, converter|
+      client.export(options.merge(:without_convert => options[:format] != :ruby)) do |exported, converter|
         exported.each do |vpc, security_groups|
           group_file = File.join(File.dirname(output_file), "#{vpc || :classic}.group")
+
+          if options[:format] == :json
+            group_file << '.json'
+          end
+
           requires << group_file
 
           logger.info("  write `#{group_file}`")
 
           open(group_file, 'wb') do |f|
-            f.puts MAGIC_COMMENT
-            f.puts converter.call(vpc => security_groups)
+            if options[:format] == :json
+              f.puts  JSON.pretty_generate(vpc => security_groups)
+            else
+              f.puts MAGIC_COMMENT
+              f.puts converter.call(vpc => security_groups)
+            end
           end
         end
       end
 
-      logger.info("  write `#{output_file}`")
+      if options[:format] == :ruby
+        logger.info("  write `#{output_file}`")
 
-      open(output_file, 'wb') do |f|
-        f.puts MAGIC_COMMENT
+        open(output_file, 'wb') do |f|
+          f.puts MAGIC_COMMENT
 
-        requires.each do |group_file|
-          f.puts "require '#{File.basename group_file}'"
+          requires.each do |group_file|
+            f.puts "require '#{File.basename group_file}'"
+          end
         end
       end
     else
+      exported = client.export(options.merge(:without_convert => options[:format] != :ruby))
+
+      if options[:format] == :json
+        exported = JSON.pretty_generate(exported)
+      end
+
       if output_file == '-'
-        logger.info('# Export SecurityGroup')
-        puts client.export(options)
+        logger.info('# Export SecurityGroup') if options[:format] == :ruby
+        puts exported
       else
         logger.info("Export SecurityGroup to `#{output_file}`")
 
         open(output_file, 'wb') do |f|
-          f.puts MAGIC_COMMENT
-          f.puts client.export(options)
+          f.puts MAGIC_COMMENT if options[:format] == :ruby
+          f.puts exported
         end
       end
     end

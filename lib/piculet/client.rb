@@ -18,14 +18,18 @@ module Piculet
         Exporter.export(@options.ec2, @options_hash.merge(options))
       end
 
-      if block_given?
-        converter = proc do |src|
+      converter = proc do |src|
+        if options[:without_convert]
+          exported
+        else
           DSL.convert(src, @options.ec2.owner_id)
         end
+      end
 
+      if block_given?
         yield(exported, converter)
       else
-        DSL.convert(exported, @options.ec2.owner_id)
+        converter.call(exported)
       end
     end
 
