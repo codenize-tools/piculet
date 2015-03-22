@@ -53,6 +53,7 @@ Usage: piculet [options]
     -e, --export
     -o, --output FILE
         --split
+        --format=FORMAT
         --no-color
         --debug
 ```
@@ -167,6 +168,79 @@ ec2 "vpc-XXXXXXXX" do
   end
 end
 ```
+
+## JSON Groupfile
+
+```json
+{
+  "vpc-12345678": {
+    "sg-12345678": {
+      "name": "default",
+      "description": "default VPC security group",
+      "tags": {
+        "key": "val"
+      },
+      "owner_id": "123456789012",
+      "ingress": [
+        {
+          "protocol": "any",
+          "port_range": null,
+          "ip_ranges": [
+
+          ],
+          "groups": [
+            {
+              "id": "sg-12345678",
+              "name": "default",
+              "owner_id": "822997939312"
+            }
+          ]
+        },
+        {
+          "protocol": "tcp",
+          "port_range": "22..22",
+          "ip_ranges": [
+            "0.0.0.0/0"
+          ],
+          "groups": [
+
+          ]
+        },
+        {
+          "protocol": "tcp",
+          "port_range": "80..80",
+          "ip_ranges": [
+            "0.0.0.0/0"
+          ],
+          "groups": [
+
+          ]
+        }
+      ],
+      "egress": [
+        {
+          "protocol": "any",
+          "port_range": null,
+          "ip_ranges": [
+            "0.0.0.0/0"
+          ],
+          "groups": [
+
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+### Export
+
+    $ piculet --export --format=json -o Groupfile.json
+
+### Apply
+
+    $ piculet --apply --format=json -o Groupfile.json
 
 ## Similar tools
 * [Codenize.tools](http://codenize.tools/)
