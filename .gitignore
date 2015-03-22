@@ -19,3 +19,4 @@ Groupfile
 *.group
 *~
 *.sw?
+/_site/
