@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
   spec.files         = %w(README.md) + Dir.glob('bin/**/*') + Dir.glob('lib/**/*')
 
-  spec.add_dependency "aws-sdk", ">= 1.48.0", "< 2.0.0"
+  spec.add_dependency "aws-sdk-v1", ">= 1.48.0"
   spec.add_dependency "term-ansicolor", ">= 1.2.2"
   #spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
