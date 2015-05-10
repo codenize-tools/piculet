@@ -17,7 +17,7 @@ EOS
 
 options = {
   :dry_run     => false,
-  :format      => :json,
+  :format      => :ruby,
   :color       => true,
   :debug       => false,
 }
