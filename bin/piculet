@@ -16,10 +16,10 @@ MAGIC_COMMENT = <<-EOS
 EOS
 
 options = {
-  :dry_run     => false,
-  :format      => :ruby,
-  :color       => true,
-  :debug       => false,
+  :dry_run => false,
+  :format  => :ruby,
+  :color   => true,
+  :debug   => false,
 }
 
 ARGV.options do |opt|
