@@ -77,7 +77,7 @@ ARGV.options do |opt|
       end
     end
 
-    if not format_passed and file =~ /\.json\z/
+    if not format_passed and [file, output_file].any? {|i| i =~ /\.json\z/ }
       options[:format] = :json
     end
   rescue => e
