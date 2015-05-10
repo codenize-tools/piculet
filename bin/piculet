@@ -29,24 +29,25 @@ ARGV.options do |opt|
     region = nil
     profile_name = nil
     credentials_path = nil
+    format_passed = false
 
-    opt.on('-p', '--profile PROFILE_NAME')          {|v| profile_name                 = v       }
-    opt.on(''  , '--credentials-path PATH')         {|v| credentials_path             = v       }
-    opt.on('-k', '--access-key ACCESS_KEY')         {|v| access_key                   = v       }
-    opt.on('-s', '--secret-key SECRET_KEY')         {|v| secret_key                   = v       }
-    opt.on('-r', '--region REGION')                 {|v| region                       = v       }
-    opt.on('-a', '--apply')                         {|v| mode                         = :apply  }
-    opt.on('-f', '--file FILE')                     {|v| file                         = v       }
-    opt.on('-n', '--names SG_LIST', Array)          {|v| options[:sg_names]           = v       }
-    opt.on('-x', '--exclude SG_LIST', Array)        {|v| options[:exclude_sgs]        = v       }
-    opt.on('',   '--ec2s VPC_IDS', Array)           {|v| options[:ec2s]               = v       }
-    opt.on('',   '--dry-run')                       {|v| options[:dry_run]            = true    }
-    opt.on('-e', '--export')                        {|v| mode                         = :export }
-    opt.on('-o', '--output FILE')                   {|v| output_file                  = v       }
-    opt.on('',   '--split')                         {|v| split                        = true    }
-    opt.on('',   '--format=FORMAT', [:ruby, :json]) {|v| options[:format]             = v       }
-    opt.on(''  , '--no-color')                      {    options[:color]              = false   }
-    opt.on(''  , '--debug')                         {    options[:debug]              = true    }
+    opt.on('-p', '--profile PROFILE_NAME')          {|v| profile_name                 = v           }
+    opt.on(''  , '--credentials-path PATH')         {|v| credentials_path             = v           }
+    opt.on('-k', '--access-key ACCESS_KEY')         {|v| access_key                   = v           }
+    opt.on('-s', '--secret-key SECRET_KEY')         {|v| secret_key                   = v           }
+    opt.on('-r', '--region REGION')                 {|v| region                       = v           }
+    opt.on('-a', '--apply')                         {|v| mode                         = :apply      }
+    opt.on('-f', '--file FILE')                     {|v| file                         = v           }
+    opt.on('-n', '--names SG_LIST', Array)          {|v| options[:sg_names]           = v           }
+    opt.on('-x', '--exclude SG_LIST', Array)        {|v| options[:exclude_sgs]        = v           }
+    opt.on('',   '--ec2s VPC_IDS', Array)           {|v| options[:ec2s]               = v           }
+    opt.on('',   '--dry-run')                       {|v| options[:dry_run]            = true        }
+    opt.on('-e', '--export')                        {|v| mode                         = :export     }
+    opt.on('-o', '--output FILE')                   {|v| output_file                  = v           }
+    opt.on('',   '--split')                         {|v| split                        = true        }
+    opt.on('',   '--format=FORMAT', [:ruby, :json]) {|v| format_passed = true; options[:format] = v }
+    opt.on(''  , '--no-color')                      {    options[:color]              = false       }
+    opt.on(''  , '--debug')                         {    options[:debug]              = true        }
     opt.parse!
 
     aws_opts = {}
@@ -76,6 +77,9 @@ ARGV.options do |opt|
       end
     end
 
+    if not format_passed and file =~ /\.json\z/
+      options[:format] = :json
+    end
   rescue => e
     $stderr.puts("[ERROR] #{e.message}")
     exit 1
