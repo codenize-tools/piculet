@@ -4,6 +4,7 @@ module Piculet
       class SecurityGroup
         class Permissions
           class Permission
+            include Logger::ClientHelper
             def initialize(security_group, direction, protocol_prot_range, &block)
               @security_group = security_group
               @direction = direction
@@ -23,7 +24,7 @@ module Piculet
             private
             def ip_ranges(*values)
               if values.empty?
-                raise ArgumentError, "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: wrong number of arguments (0 for 1..)"
+                log(:warn, "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges` contains no ip ranges", :yellow)
               end
 
               values.each do |ip_range|
