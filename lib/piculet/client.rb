@@ -185,7 +185,6 @@ module Piculet
       perm_list_aws = collect_to_hash(permissions_aws, :protocol, :port_range)
 
       perm_list_aws.each do |key, perm_aws|
-        protocol, port_range = key
         perm_dsl = perm_list_dsl.delete(key)
 
         if perm_dsl
@@ -198,6 +197,7 @@ module Piculet
       end
 
       perm_list_dsl.each do |key, perm_dsl|
+        protocol, port_range = key
         permissions_aws.create(protocol, port_range, perm_dsl)
       end
     end
