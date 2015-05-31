@@ -162,21 +162,21 @@ module Piculet
       perm_list_dsl = collect_to_hash(permissions_dsl, :protocol, :port_range)
       perm_list_aws = collect_to_hash(permissions_aws, :protocol, :port_range)
 
-      perm_list_dsl.each do |key, perm_dsl|
+      perm_list_aws.each do |key, perm_aws|
         protocol, port_range = key
-        perm_aws = perm_list_aws.delete(key)
+        perm_dsl = perm_list_dsl.delete(key)
 
-        if perm_aws
+        if perm_dsl
           unless perm_aws.eql?(perm_dsl)
             perm_aws.update(perm_dsl)
           end
         else
-          permissions_aws.create(protocol, port_range, perm_dsl)
+          perm_aws.delete
         end
       end
 
-      perm_list_aws.each do |key, perm_aws|
-        perm_aws.delete
+      perm_list_dsl.each do |key, perm_dsl|
+        permissions_aws.create(protocol, port_range, perm_dsl)
       end
     end
 
