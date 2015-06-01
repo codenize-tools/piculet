@@ -18,14 +18,18 @@ module Piculet
         Exporter.export(@options.ec2, @options_hash.merge(options))
       end
 
-      if block_given?
-        converter = proc do |src|
+      converter = proc do |src|
+        if options[:without_convert]
+          exported
+        else
           DSL.convert(src, @options.ec2.owner_id)
         end
+      end
 
+      if block_given?
         yield(exported, converter)
       else
-        DSL.convert(exported, @options.ec2.owner_id)
+        converter.call(exported)
       end
     end
 
@@ -33,13 +37,31 @@ module Piculet
     def load_file(file)
       if file.kind_of?(String)
         open(file) do |f|
-          DSL.define(f.read, file).result
+          load_by_format(f.read, file)
         end
       elsif file.respond_to?(:read)
-        DSL.define(file.read, file.path).result
+        load_by_format(file.read, file.path)
       else
         raise TypeError, "can't convert #{file} into File"
       end
+    end
+
+    def load_by_format(src, path)
+      if @options.format == :json
+        src = load_json(src, path)
+      end
+
+      DSL.define(src, path).result
+    end
+
+    def load_json(json, path)
+      json = JSON.parse(json, :symbolize_names => true)
+
+      if json.has_key?(:'')
+        json[nil] = json.delete(:'')
+      end
+
+      DSL.convert(json, @options.ec2.owner_id)
     end
 
     def walk(file)
@@ -163,7 +185,6 @@ module Piculet
       perm_list_aws = collect_to_hash(permissions_aws, :protocol, :port_range)
 
       perm_list_aws.each do |key, perm_aws|
-        protocol, port_range = key
         perm_dsl = perm_list_dsl.delete(key)
 
         if perm_dsl
@@ -176,6 +197,7 @@ module Piculet
       end
 
       perm_list_dsl.each do |key, perm_dsl|
+        protocol, port_range = key
         permissions_aws.create(protocol, port_range, perm_dsl)
       end
     end

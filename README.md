@@ -4,7 +4,7 @@ Piculet is a tool to manage EC2 Security Group.
 
 It defines the state of EC2 Security Group using DSL, and updates EC2 Security Group according to DSL.
 
-[![Gem Version](https://badge.fury.io/rb/piculet.png)](http://badge.fury.io/rb/piculet)
+[![Gem Version](https://badge.fury.io/rb/piculet.svg)](http://badge.fury.io/rb/piculet)
 [![Build Status](https://travis-ci.org/winebarrel/piculet.svg?branch=master)](https://travis-ci.org/winebarrel/piculet)
 
 ## Installation
@@ -53,6 +53,7 @@ Usage: piculet [options]
     -e, --export
     -o, --output FILE
         --split
+        --format=FORMAT
         --no-color
         --debug
 ```
@@ -167,6 +168,79 @@ ec2 "vpc-XXXXXXXX" do
   end
 end
 ```
+
+## JSON Groupfile
+
+```json
+{
+  "vpc-12345678": {
+    "sg-12345678": {
+      "name": "default",
+      "description": "default VPC security group",
+      "tags": {
+        "key": "val"
+      },
+      "owner_id": "123456789012",
+      "ingress": [
+        {
+          "protocol": "any",
+          "port_range": null,
+          "ip_ranges": [
+
+          ],
+          "groups": [
+            {
+              "id": "sg-12345678",
+              "name": "default",
+              "owner_id": "123456789012"
+            }
+          ]
+        },
+        {
+          "protocol": "tcp",
+          "port_range": "22..22",
+          "ip_ranges": [
+            "0.0.0.0/0"
+          ],
+          "groups": [
+
+          ]
+        },
+        {
+          "protocol": "tcp",
+          "port_range": "80..80",
+          "ip_ranges": [
+            "0.0.0.0/0"
+          ],
+          "groups": [
+
+          ]
+        }
+      ],
+      "egress": [
+        {
+          "protocol": "any",
+          "port_range": null,
+          "ip_ranges": [
+            "0.0.0.0/0"
+          ],
+          "groups": [
+
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+### Export
+
+    $ piculet --export --format=json -o Groupfile.json
+
+### Apply
+
+    $ piculet --apply --format=json -f Groupfile.json
 
 ## Similar tools
 * [Codenize.tools](http://codenize.tools/)

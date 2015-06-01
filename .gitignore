@@ -20,3 +20,4 @@ Groupfile
 *~
 *.sw?
 /_site/
+*.json

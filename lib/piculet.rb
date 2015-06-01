@@ -5,7 +5,7 @@ require 'set'
 require 'singleton'
 require 'term/ansicolor'
 
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 require 'piculet/ext/ec2-owner-id-ext'
 require 'piculet/ext/security-group'
