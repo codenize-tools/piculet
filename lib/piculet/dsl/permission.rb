@@ -38,6 +38,10 @@ module Piculet
                 end
               end
 
+              if values.size != values.uniq.size
+                raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: duplicate ip ranges"
+              end
+
               @result.ip_ranges = values
             end
 
@@ -50,6 +54,10 @@ module Piculet
                 unless [String, Array].any? {|i| group.kind_of?(i) }
                   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `groups`: invalid type: #{group}"
                 end
+              end
+
+              if values.size != values.uniq.size
+                raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `groups`: duplicate groups"
               end
 
               @result.groups = values
