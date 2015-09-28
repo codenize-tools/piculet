@@ -40,6 +40,7 @@ ARGV.options do |opt|
     opt.on('-f', '--file FILE')                     {|v| file                         = v           }
     opt.on('-n', '--names SG_LIST', Array)          {|v| options[:sg_names]           = v           }
     opt.on('-x', '--exclude SG_LIST', Array)        {|v| options[:exclude_sgs]        = v           }
+    opt.on('-t', '--exclude_tag TAGS', Array)       {|v| options[:exclude_tags]       = v           }
     opt.on('',   '--ec2s VPC_IDS', Array)           {|v| options[:ec2s]               = v           }
     opt.on('',   '--dry-run')                       {|v| options[:dry_run]            = true        }
     opt.on('-e', '--export')                        {|v| mode                         = :export     }

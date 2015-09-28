@@ -13,11 +13,14 @@ module Piculet
       AWS.memoize { walk(file) }
     end
 
-    def should_skip(sg_name)
+    def should_skip(sg_name, sg)
+      # Name
       if @options.sg_names
         return true unless @options.sg_names.include?(sg_name)
       end
       return true if @options.exclude_sgs and @options.exclude_sgs.any? {|regex| sg_name =~ regex}
+      # Tag
+      return true if sg and @options.exclude_tags and @options.exclude_tags.any? {|tagname| !sg.tags[tagname].to_s.empty?}
     end
 
     def export(options = {})
@@ -105,7 +108,7 @@ module Piculet
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
 
-        next if should_skip(name)
+        next if should_skip(name,sg_list_aws[key])
 
         sg_aws = sg_list_aws[key]
 
@@ -123,7 +126,7 @@ module Piculet
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
 
-        next if should_skip(name)
+        next if should_skip(name,sg_list_aws[key])
 
         sg_aws = sg_list_aws.delete(key)
         walk_security_group(sg_dsl, sg_aws)
@@ -132,7 +135,7 @@ module Piculet
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        next if should_skip(name)
+        next if should_skip(name,sg_list_aws[key])
 
         sg_aws.ingress_ip_permissions.each {|i| i.delete }
         sg_aws.egress_ip_permissions.each {|i| i.delete } if vpc
@@ -141,7 +144,7 @@ module Piculet
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        next if should_skip(name)
+        next if should_skip(name,sg_list_aws[key])
 
         sg_aws.delete
       end
