@@ -13,6 +13,13 @@ module Piculet
       AWS.memoize { walk(file) }
     end
 
+    def should_skip(sg_name)
+      if @options.sg_names
+        return true unless @options.sg_names.include?(sg_name)
+      end
+      return true if @options.exclude_sgs and @options.exclude_sgs.any? {|regex| sg_name =~ regex}
+    end
+
     def export(options = {})
       exported = AWS.memoize do
         Exporter.export(@options.ec2, @options_hash.merge(options))
@@ -98,13 +105,7 @@ module Piculet
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
 
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
+        next if should_skip(name)
 
         sg_aws = sg_list_aws[key]
 
@@ -122,13 +123,7 @@ module Piculet
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
 
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
+        next if should_skip(name)
 
         sg_aws = sg_list_aws.delete(key)
         walk_security_group(sg_dsl, sg_aws)
@@ -137,13 +132,7 @@ module Piculet
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
+        next if should_skip(name)
 
         sg_aws.ingress_ip_permissions.each {|i| i.delete }
         sg_aws.egress_ip_permissions.each {|i| i.delete } if vpc
@@ -152,13 +141,7 @@ module Piculet
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
+        next if should_skip(name)
 
         sg_aws.delete
       end
