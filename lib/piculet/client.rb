@@ -16,11 +16,25 @@ module Piculet
     def should_skip(sg_name, sg)
       # Name
       if @options.sg_names
-        return true unless @options.sg_names.include?(sg_name)
+        if not @options.sg_names.include?(sg_name)
+          return true
+        end
       end
-      return true if @options.exclude_sgs and @options.exclude_sgs.any? {|regex| sg_name =~ regex}
+
+      if @options.exclude_sgs
+        if @options.exclude_sgs.any? {|regex| sg_name =~ regex}
+          return true
+        end
+      end
+
       # Tag
-      return true if sg and @options.exclude_tags and @options.exclude_tags.any? {|tagname| !sg.tags[tagname].to_s.empty?}
+      if @options.exclude_tags
+        if sg and @options.exclude_tags.any? {|tagname| not sg.tags.has_key?(tagname) }
+          return true
+        end
+      end
+
+      false
     end
 
     def export(options = {})
@@ -107,10 +121,9 @@ module Piculet
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
-
-        next if should_skip(name,sg_list_aws[key])
-
         sg_aws = sg_list_aws[key]
+
+        next if should_skip(name, sg_aws)
 
         unless sg_aws
           sg_aws = collection_api.create(name, :vpc => vpc, :description => sg_dsl.description)
@@ -125,17 +138,17 @@ module Piculet
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
-
-        next if should_skip(name,sg_list_aws[key])
-
         sg_aws = sg_list_aws.delete(key)
+
+        next if should_skip(name, sg_aws)
+
         walk_security_group(sg_dsl, sg_aws)
       end
 
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        next if should_skip(name,sg_list_aws[key])
+        next if should_skip(name, sg_aws)
 
         sg_aws.ingress_ip_permissions.each {|i| i.delete }
         sg_aws.egress_ip_permissions.each {|i| i.delete } if vpc
@@ -144,7 +157,7 @@ module Piculet
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        next if should_skip(name,sg_list_aws[key])
+        next if should_skip(name, sg_aws)
 
         sg_aws.delete
       end
