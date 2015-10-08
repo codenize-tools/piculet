@@ -48,7 +48,7 @@ Usage: piculet [options]
     -f, --file FILE
     -n, --names SG_LIST
     -x, --exclude SG_LIST
-    -t, --exclude_tag TAGS
+    -t, --exclude-tags TAG_LIST
         --ec2s VPC_IDS
         --dry-run
     -e, --export
