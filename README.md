@@ -13,6 +13,7 @@ It defines the state of EC2 Security Group using DSL, and updates EC2 Security G
   * Add ip/group duplicate check [PR#16](https://github.com/winebarrel/piculet/pull/16)
   * Add `--exclude-tags` option [PR#17](https://github.com/winebarrel/piculet/pull/18)
   * Support Template
+  * Add `--split-more` option
 
 ## Installation
 
@@ -61,6 +62,7 @@ Usage: piculet [options]
     -e, --export
     -o, --output FILE
         --split
+        --split-more
         --format=FORMAT
         --no-color
         --debug
