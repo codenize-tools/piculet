@@ -126,7 +126,7 @@ ec2 TEST_VPC_ID do
   security_group "any_other_security_group" do
     description "any other security group"
     context.ingress_ip_range = "0.0.0.0/0"
-    include_template "base", egress_ip_range: "0.0.0.0/0"
+    include_template "basic", egress_ip_range: "0.0.0.0/0"
   end
 
   security_group "default" do
