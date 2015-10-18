@@ -6,6 +6,7 @@ require 'singleton'
 require 'term/ansicolor'
 require 'diffy'
 require 'pp'
+require 'hashie'
 
 require 'aws-sdk-v1'
 
@@ -15,6 +16,7 @@ require 'piculet/ext/ip-permission-collection-ext'
 require 'piculet/ext/string-ext'
 
 require 'piculet/logger'
+require 'piculet/template-helper'
 require 'piculet/utils'
 require 'piculet/client'
 require 'piculet/dsl'

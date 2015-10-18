@@ -4,10 +4,18 @@ module Piculet
       class SecurityGroup
         class Permissions
           class Permission
-            def initialize(security_group, direction, protocol_prot_range, &block)
+            include Piculet::TemplateHelper
+
+            def initialize(context, security_group, direction, protocol_prot_range, &block)
               @security_group = security_group
               @direction = direction
               @protocol_prot_range = protocol_prot_range
+
+              @context = context.merge(
+                :protocol => protocol_prot_range[0],
+                :port_range => protocol_prot_range[1]
+              )
+
               @result = OpenStruct.new
               instance_eval(&block)
             end

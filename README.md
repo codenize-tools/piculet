@@ -170,6 +170,40 @@ ec2 "vpc-XXXXXXXX" do
 end
 ```
 
+## Use Template
+
+```ruby
+template "basic" do
+  permission :tcp, 22..22 do
+    ip_ranges(
+      "0.0.0.0/0",
+    )
+  end
+end
+
+template "egress" do
+  egress do
+    permission :any do
+      ip_ranges(
+        context.ip_addr || "0.0.0.0/0"
+      )
+    end
+  end
+end
+
+ec2 "vpc-XXXXXXXX" do
+  security_group "default" do
+    description "default VPC security group"
+
+    ingress do
+      include_template "basic"
+    end
+
+    include_template "egress", :ip_addr => "192.168.0.0/24"
+  end
+end
+```
+
 ## JSON Groupfile
 
 ```json

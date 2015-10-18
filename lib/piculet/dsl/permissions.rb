@@ -4,10 +4,12 @@ module Piculet
       class SecurityGroup
         class Permissions
           include Logger::ClientHelper
+          include Piculet::TemplateHelper
 
-          def initialize(security_group, direction, &block)
+          def initialize(context, security_group, direction, &block)
             @security_group = security_group
             @direction = direction
+            @context = context.merge(:direction => direction)
             @result = {}
             instance_eval(&block)
           end
@@ -32,7 +34,7 @@ module Piculet
             end
 
             key = [protocol, port_range]
-            res = Permission.new(@security_group, @direction, key, &block).result
+            res = Permission.new(@context, @security_group, @direction, key, &block).result
 
             if @result.has_key?(key)
               @result[key] = OpenStruct.new(@result[key].marshal_dump.merge(res.marshal_dump) {|hash_key, old_val, new_val|
