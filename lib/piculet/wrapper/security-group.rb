@@ -71,7 +71,7 @@ module Piculet
           self_tags = normalize_tags(self.tags)
           dsl_tags = normalize_tags(dsl.tags)
 
-          log(:info, "  set tags=#{dsl_tags.inspect}" , :green)
+          log(:info, "  tags:\n".green + Piculet::Utils.diff(self_tags, dsl_tags, :color => @options.color, :indent => '    '), false)
 
           unless @options.dry_run
             if dsl_tags.empty?
