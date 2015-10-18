@@ -7,6 +7,13 @@ It defines the state of EC2 Security Group using DSL, and updates EC2 Security G
 [![Gem Version](https://badge.fury.io/rb/piculet.svg)](http://badge.fury.io/rb/piculet)
 [![Build Status](https://travis-ci.org/winebarrel/piculet.svg?branch=master)](https://travis-ci.org/winebarrel/piculet)
 
+## Notice
+
+* `>= 0.2.9`
+  * Add ip/group duplicate check [PR#16](https://github.com/winebarrel/piculet/pull/16)
+  * Add `--exclude-tags` option [PR#17](https://github.com/winebarrel/piculet/pull/18)
+  * Support Template
+
 ## Installation
 
 Add this line to your application's Gemfile:
