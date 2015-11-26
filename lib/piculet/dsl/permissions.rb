@@ -27,8 +27,12 @@ module Piculet
 
           private
           def permission(protocol, port_range = nil, &block)
-            if port_range and not port_range.kind_of?(Range)
-              raise TypeError, "SecurityGroup `#{@security_group}`: #{@direction}: can't convert #{port_range} into Range"
+            if port_range
+              if port_range.kind_of?(Integer)
+                port_range = port_range..port_range
+              else not port_range.kind_of?(Range)
+                raise TypeError, "SecurityGroup `#{@security_group}`: #{@direction}: can't convert #{port_range} into Range"
+              end
             end
 
             key = [protocol, port_range]
