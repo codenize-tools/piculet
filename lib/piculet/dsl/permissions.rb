@@ -32,7 +32,7 @@ module Piculet
             if port_range
               if port_range.kind_of?(Integer)
                 port_range = port_range..port_range
-              else not port_range.kind_of?(Range)
+              elsif not port_range.kind_of?(Range)
                 raise TypeError, "SecurityGroup `#{@security_group}`: #{@direction}: can't convert #{port_range} into Range"
               end
             end
