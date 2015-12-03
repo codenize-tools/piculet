@@ -14,6 +14,7 @@ It defines the state of EC2 Security Group using DSL, and updates EC2 Security G
   * Add `--exclude-tags` option [PR#17](https://github.com/winebarrel/piculet/pull/18)
   * Support Template
   * Add `--split-more` option
+  * Single port support: `permission :tcp, 80`
 
 ## Installation
 
