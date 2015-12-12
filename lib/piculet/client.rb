@@ -29,7 +29,7 @@ module Piculet
 
       # Tag
       if @options.exclude_tags
-        if sg and @options.exclude_tags.any? {|tagname| not sg.tags.has_key?(tagname) }
+        if sg and (@options.exclude_tags & sg.tags.keys).any?
           return true
         end
       end
