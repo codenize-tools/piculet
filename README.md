@@ -65,6 +65,7 @@ Usage: piculet [options]
         --split
         --split-more
         --format=FORMAT
+        --ignore-owner-id
         --no-color
         --debug
 ```

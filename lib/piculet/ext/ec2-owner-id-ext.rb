@@ -13,8 +13,12 @@ module AWS
       return @owner_id
     end
 
-    def own?(other)
-      other == owner_id
+    def own?(other, options = {})
+      if options[:ignore_owner_id]
+        true
+      else
+        other == owner_id
+      end
     end
 
     private

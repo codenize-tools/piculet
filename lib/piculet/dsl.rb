@@ -9,8 +9,8 @@ module Piculet
         end
       end
 
-      def convert(exported, owner_id)
-        Converter.convert(exported, owner_id)
+      def convert(exported, owner_id, options = {})
+        Converter.convert(exported, owner_id, options)
       end
     end # of class methods
 

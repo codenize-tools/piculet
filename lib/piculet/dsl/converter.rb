@@ -2,14 +2,15 @@ module Piculet
   class DSL
     class Converter
       class << self
-        def convert(exported, owner_id)
-          self.new(exported, owner_id).convert
+        def convert(exported, owner_id, options = {})
+          self.new(exported, owner_id, options).convert
         end
       end # of class methods
 
-      def initialize(exported, owner_id)
+      def initialize(exported, owner_id, options = {})
         @exported = exported
         @owner_id = owner_id
+        @options = options
       end
 
       def convert
@@ -118,7 +119,7 @@ end
 
           if AWS::EC2::SecurityGroup.elb?(owner_id)
             arg = AWS::EC2::SecurityGroup.elb_sg
-          elsif @owner_id == owner_id
+          elsif @options[:ignore_owner_id] or @owner_id == owner_id
             arg = name_or_id
           else
             arg = [owner_id, i[:id]]

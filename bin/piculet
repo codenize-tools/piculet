@@ -48,6 +48,7 @@ ARGV.options do |opt|
     opt.on('',   '--split')                         {|v| split                        = true        }
     opt.on('',   '--split-more')                    {|v| split                        = :more       }
     opt.on('',   '--format=FORMAT', [:ruby, :json]) {|v| format_passed = true; options[:format] = v }
+    opt.on('',   '--ignore-owner-id')               {    options[:ignore_owner_id]    = true        }
     opt.on(''  , '--no-color')                      {    options[:color]              = false       }
     opt.on(''  , '--debug')                         {    options[:debug]              = true        }
     opt.parse!

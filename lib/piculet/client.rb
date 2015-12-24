@@ -46,7 +46,7 @@ module Piculet
         if options[:without_convert]
           exported
         else
-          DSL.convert(src, @options.ec2.owner_id)
+          DSL.convert(src, @options.ec2.owner_id, @options)
         end
       end
 
@@ -85,7 +85,7 @@ module Piculet
         json[nil] = json.delete(:'')
       end
 
-      DSL.convert(json, @options.ec2.owner_id)
+      DSL.convert(json, @options.ec2.owner_id, @options)
     end
 
     def walk(file)
