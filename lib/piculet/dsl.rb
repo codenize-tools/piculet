@@ -5,7 +5,7 @@ module Piculet
     class << self
       def define(source, path)
         self.new(path) do
-          eval(source, binding)
+          eval(source, binding, path)
         end
       end
 
