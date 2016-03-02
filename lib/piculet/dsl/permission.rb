@@ -1,3 +1,4 @@
+require 'ipaddr'
 module Piculet
   class DSL
     class EC2
@@ -43,6 +44,15 @@ module Piculet
 
                 unless ip.split('.').all? {|i| (0..255).include?(i.to_i) } and (0..32).include?(range.to_i)
                   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range}"
+                end
+
+                begin
+                  ipaddr = IPAddr.new(ip_range)
+                  unless ip == ipaddr.to_s
+                    raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range} correct #{ipaddr.to_s}/#{range}"
+                  end
+                rescue => e
+                  raise e
                 end
               end
 
