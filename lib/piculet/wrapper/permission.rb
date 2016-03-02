@@ -39,7 +39,7 @@ module Piculet
             def delete
               log(:info, 'Delete Permission', :red, log_id)
 
-              self_ip_ranges, self_groups = normalize_self_attrs
+              self_ip_ranges, self_groups = normalize_self_attrs([])
 
               unless (self_ip_ranges + self_groups).empty?
                 @collection.revoke(protocol, port_range, (self_ip_ranges + self_groups), :log_color => :red)
@@ -74,15 +74,19 @@ module Piculet
                 end
               }.sort
 
-              self_ip_ranges, self_groups = normalize_self_attrs
+              self_ip_ranges, self_groups = normalize_self_attrs(dsl_groups.map { |g| g[1] })
 
               [dsl_ip_ranges, dsl_groups, self_ip_ranges, self_groups]
             end
 
-            def normalize_self_attrs
+            def normalize_self_attrs(dsl_group_names)
               self_ip_ranges = (@permission.ip_ranges || []).sort
               self_groups = (@permission.groups || []).map {|i|
-                [i.owner_id, i.name]
+                if dsl_group_names.include?(i.security_group_id)
+                  [i.owner_id, i.security_group_id]
+                else
+                  [i.owner_id, i.name]
+                end
               }.sort
 
               [self_ip_ranges, self_groups]
