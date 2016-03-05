@@ -1,4 +1,3 @@
-require 'ipaddr'
 module Piculet
   class DSL
     class EC2

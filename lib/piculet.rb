@@ -7,6 +7,7 @@ require 'term/ansicolor'
 require 'diffy'
 require 'pp'
 require 'hashie'
+require 'ipaddr'
 
 require 'aws-sdk-v1'
 
