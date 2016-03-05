@@ -46,12 +46,13 @@ module Piculet
                 end
 
                 begin
-                  ipaddr = IPAddr.new(ip_range)
-                  unless ip == ipaddr.to_s
-                    raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range} correct #{ipaddr.to_s}/#{range}"
+                  parsed_ipaddr = IPAddr.new(ip_range)
+
+                  if ip != parsed_ipaddr.to_s
+                    raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range} correct #{parsed_ipaddr.to_s}/#{range}"
                   end
                 rescue => e
-                  raise e
+                  raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: #{ip_range}: #{e.message}"
                 end
               end
 
