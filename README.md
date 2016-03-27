@@ -289,3 +289,46 @@ end
 
 ## Similar tools
 * [Codenize.tools](http://codenize.tools/)
+
+## For piculet developers
+### Minimum required IAM policy to run tests
+
+```ruby
+user 'piculet', path: '/' do
+  policy 'piculet' do
+    {
+      'Version' => '2012-10-17',
+      'Statement' => [
+        {
+          'Effect' => 'Allow',
+          'Action' => [
+            'ec2:CreateSecurityGroup',
+            'ec2:CreateTags',
+            'ec2:DeleteTags',
+            'ec2:DescribeSecurityGroups',
+            'ec2:DescribeTags',
+            'iam:GetUser',
+          ],
+          'Resource' => '*',
+        },
+        {
+          'Effect' => 'Allow',
+          'Action' => [
+            'ec2:AuthorizeSecurityGroupEgress',
+            'ec2:AuthorizeSecurityGroupIngress',
+            'ec2:DeleteSecurityGroup',
+            'ec2:RevokeSecurityGroupEgress',
+            'ec2:RevokeSecurityGroupIngress',
+          ],
+          'Resource' => '*',
+          'Condition' => {
+            'StringEquals' => {
+              'ec2:Vpc' => "arn:aws:ec2:#{ENV['TEST_AWS_REGION']}:#{ENV['TEST_OWNER_ID']}:vpc/#{ENV['TEST_VPC_ID']}",
+            },
+          },
+        },
+      ],
+    }
+  end
+end
+```
