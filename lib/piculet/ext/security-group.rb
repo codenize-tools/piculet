@@ -12,6 +12,8 @@ module AWS
 
       def name
         self.elb? ? ELB_NAME : name_orig
+      rescue AWS::EC2::Errors::InvalidGroup::NotFound
+        self.id
       end
 
       class << self

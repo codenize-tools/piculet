@@ -40,11 +40,13 @@ ARGV.options do |opt|
     opt.on('-f', '--file FILE')                     {|v| file                         = v           }
     opt.on('-n', '--names SG_LIST', Array)          {|v| options[:sg_names]           = v           }
     opt.on('-x', '--exclude SG_LIST', Array)        {|v| options[:exclude_sgs]        = v           }
+    opt.on('-t', '--exclude-tags TAGS_LIST', Array) {|v| options[:exclude_tags]       = v           }
     opt.on('',   '--ec2s VPC_IDS', Array)           {|v| options[:ec2s]               = v           }
     opt.on('',   '--dry-run')                       {|v| options[:dry_run]            = true        }
     opt.on('-e', '--export')                        {|v| mode                         = :export     }
     opt.on('-o', '--output FILE')                   {|v| output_file                  = v           }
     opt.on('',   '--split')                         {|v| split                        = true        }
+    opt.on('',   '--split-more')                    {|v| split                        = :more       }
     opt.on('',   '--format=FORMAT', [:ruby, :json]) {|v| format_passed = true; options[:format] = v }
     opt.on(''  , '--no-color')                      {    options[:color]              = false       }
     opt.on(''  , '--debug')                         {    options[:debug]              = true        }
@@ -107,11 +109,10 @@ begin
 
       output_file = 'Groupfile' if output_file == '-'
       requires = []
+      base_dir = File.dirname(output_file)
 
       client.export(options.merge(:without_convert => options[:format] != :ruby)) do |exported, converter|
-        exported.each do |vpc, security_groups|
-          group_file = File.join(File.dirname(output_file), "#{vpc || :classic}.group")
-
+        write_group_file = proc do |group_file, vpc, security_groups|
           if options[:format] == :json
             group_file << '.json'
           end
@@ -119,6 +120,7 @@ begin
           requires << group_file
 
           logger.info("  write `#{group_file}`")
+          FileUtils.mkdir_p(File.dirname(group_file))
 
           open(group_file, 'wb') do |f|
             if options[:format] == :json
@@ -127,6 +129,19 @@ begin
               f.puts MAGIC_COMMENT
               f.puts converter.call(vpc => security_groups)
             end
+          end
+        end
+
+        exported.each do |vpc, security_groups|
+          if split == :more
+            security_groups.each do |sg_id, sg_attrs|
+              sg_name = sg_attrs.fetch(:name)
+              group_file = File.join(base_dir, vpc || 'classic', "#{sg_name}.group")
+              write_group_file.call(group_file, vpc, sg_id => sg_attrs)
+            end
+          else
+            group_file = File.join(base_dir, "#{vpc || :classic}.group")
+            write_group_file.call(group_file, vpc, security_groups)
           end
         end
       end
@@ -138,7 +153,8 @@ begin
           f.puts MAGIC_COMMENT
 
           requires.each do |group_file|
-            f.puts "require '#{File.basename group_file}'"
+            group_file.sub!(%r|\A#{Regexp.escape base_dir}/?|, '')
+            f.puts "require '#{group_file}'"
           end
         end
       end

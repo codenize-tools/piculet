@@ -2,9 +2,12 @@ module Piculet
   class DSL
     class EC2
       class SecurityGroup
-        def initialize(name, vpc, &block)
+        include Piculet::TemplateHelper
+
+        def initialize(context, name, vpc, &block)
           @name = name
           @vpc = vpc
+          @context = context.merge(:security_group_name => name)
 
           @result = OpenStruct.new({
             :name    => name,
@@ -47,7 +50,7 @@ module Piculet
             raise "SecurityGroup `#{@name}`: `ingress` is already defined"
           end
 
-          @result.ingress = Permissions.new(@name, :ingress, &block).result
+          @result.ingress = Permissions.new(@context, @name, :ingress, &block).result
           @ingress_is_defined = true
         end
 
@@ -60,7 +63,7 @@ module Piculet
             raise "SecurityGroup `#{@name}`: Cannot define `egress` in classic"
           end
 
-          @result.egress = Permissions.new(@name, :egress, &block).result
+          @result.egress = Permissions.new(@context, @name, :egress, &block).result
 
           @egress_is_defined = true
         end

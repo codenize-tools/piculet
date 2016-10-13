@@ -7,6 +7,15 @@ It defines the state of EC2 Security Group using DSL, and updates EC2 Security G
 [![Gem Version](https://badge.fury.io/rb/piculet.svg)](http://badge.fury.io/rb/piculet)
 [![Build Status](https://travis-ci.org/winebarrel/piculet.svg?branch=master)](https://travis-ci.org/winebarrel/piculet)
 
+## Notice
+
+* `>= 0.2.9`
+  * Add ip/group duplicate check [PR#16](https://github.com/winebarrel/piculet/pull/16)
+  * Add `--exclude-tags` option [PR#17](https://github.com/winebarrel/piculet/pull/18)
+  * Support Template
+  * Add `--split-more` option
+  * Single port support: `permission :tcp, 80`
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -48,11 +57,13 @@ Usage: piculet [options]
     -f, --file FILE
     -n, --names SG_LIST
     -x, --exclude SG_LIST
+    -t, --exclude-tags TAG_LIST
         --ec2s VPC_IDS
         --dry-run
     -e, --export
     -o, --output FILE
         --split
+        --split-more
         --format=FORMAT
         --no-color
         --debug
@@ -169,6 +180,40 @@ ec2 "vpc-XXXXXXXX" do
 end
 ```
 
+## Use Template
+
+```ruby
+template "basic" do
+  permission :tcp, 22..22 do
+    ip_ranges(
+      "0.0.0.0/0",
+    )
+  end
+end
+
+template "egress" do
+  egress do
+    permission :any do
+      ip_ranges(
+        context.ip_addr || "0.0.0.0/0"
+      )
+    end
+  end
+end
+
+ec2 "vpc-XXXXXXXX" do
+  security_group "default" do
+    description "default VPC security group"
+
+    ingress do
+      include_template "basic"
+    end
+
+    include_template "egress", :ip_addr => "192.168.0.0/24"
+  end
+end
+```
+
 ## JSON Groupfile
 
 ```json
@@ -244,3 +289,46 @@ end
 
 ## Similar tools
 * [Codenize.tools](http://codenize.tools/)
+
+## For piculet developers
+### Minimum required IAM policy to run tests
+
+```ruby
+user 'piculet', path: '/' do
+  policy 'piculet' do
+    {
+      'Version' => '2012-10-17',
+      'Statement' => [
+        {
+          'Effect' => 'Allow',
+          'Action' => [
+            'ec2:CreateSecurityGroup',
+            'ec2:CreateTags',
+            'ec2:DeleteTags',
+            'ec2:DescribeSecurityGroups',
+            'ec2:DescribeTags',
+            'iam:GetUser',
+          ],
+          'Resource' => '*',
+        },
+        {
+          'Effect' => 'Allow',
+          'Action' => [
+            'ec2:AuthorizeSecurityGroupEgress',
+            'ec2:AuthorizeSecurityGroupIngress',
+            'ec2:DeleteSecurityGroup',
+            'ec2:RevokeSecurityGroupEgress',
+            'ec2:RevokeSecurityGroupIngress',
+          ],
+          'Resource' => '*',
+          'Condition' => {
+            'StringEquals' => {
+              'ec2:Vpc' => "arn:aws:ec2:#{ENV['TEST_AWS_REGION']}:#{ENV['TEST_OWNER_ID']}:vpc/#{ENV['TEST_VPC_ID']}",
+            },
+          },
+        },
+      ],
+    }
+  end
+end
+```

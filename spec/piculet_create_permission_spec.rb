@@ -24,7 +24,7 @@ EOS
   end
 
   [:ingress, :egress].each do |direction|
-    [[:tcp, 80..81], [:udp, 53..54], [:any, nil], [:icmp, -1..-1], [:"50", nil]].each do |protocol, port_range|
+    [[:tcp, 80..81], [:udp, 53..54], [:any, nil], [:icmp, -1..-1], [:"50", nil], [:tcp, 80]].each do |protocol, port_range|
       context "add #{protocol} #{direction} permission allow from ip ranges" do #
         it do
           groupfile { (<<"EOS")
@@ -48,7 +48,7 @@ EOS
           expected_permissions = [[
             [:groups     , EMPTY_ARRAY],
             [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
-            [:port_range , port_range],
+            [:port_range , port_range.kind_of?(Integer) ? port_range..port_range : port_range],
             [:protocol   , protocol],
           ]]
 
@@ -107,7 +107,7 @@ EOS
               [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
             ]],
             [:ip_ranges  , EMPTY_ARRAY],
-            [:port_range , port_range],
+            [:port_range , port_range.kind_of?(Integer) ? port_range..port_range : port_range],
             [:protocol   , protocol],
           ]]
 
@@ -190,7 +190,7 @@ EOS
               [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
             ]],
             [:ip_ranges  , EMPTY_ARRAY],
-            [:port_range , port_range],
+            [:port_range , port_range.kind_of?(Integer) ? port_range..port_range : port_range],
             [:protocol   , protocol],
           ]]
 
@@ -260,7 +260,7 @@ EOS
               [[:name, "default"]                 , [:owner_id, TEST_OWNER_ID]],
             ]],
             [:ip_ranges  , ["0.0.0.0/0", "127.0.0.1/32"]],
-            [:port_range , port_range],
+            [:port_range , port_range.kind_of?(Integer) ? port_range..port_range : port_range],
             [:protocol   , protocol],
           ]]
 

@@ -4,10 +4,18 @@ module Piculet
       class SecurityGroup
         class Permissions
           class Permission
-            def initialize(security_group, direction, protocol_prot_range, &block)
+            include Piculet::TemplateHelper
+
+            def initialize(context, security_group, direction, protocol_prot_range, &block)
               @security_group = security_group
               @direction = direction
               @protocol_prot_range = protocol_prot_range
+
+              @context = context.merge(
+                :protocol => protocol_prot_range[0],
+                :port_range => protocol_prot_range[1]
+              )
+
               @result = OpenStruct.new
               instance_eval(&block)
             end
@@ -36,6 +44,20 @@ module Piculet
                 unless ip.split('.').all? {|i| (0..255).include?(i.to_i) } and (0..32).include?(range.to_i)
                   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range}"
                 end
+
+                begin
+                  parsed_ipaddr = IPAddr.new(ip_range)
+
+                  if ip != parsed_ipaddr.to_s
+                    raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range} correct #{parsed_ipaddr.to_s}/#{range}"
+                  end
+                rescue => e
+                  raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: #{ip_range}: #{e.message}"
+                end
+              end
+
+              if values.size != values.uniq.size
+                raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: duplicate ip ranges"
               end
 
               @result.ip_ranges = values
@@ -50,6 +72,10 @@ module Piculet
                 unless [String, Array].any? {|i| group.kind_of?(i) }
                   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `groups`: invalid type: #{group}"
                 end
+              end
+
+              if values.size != values.uniq.size
+                raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `groups`: duplicate groups"
               end
 
               @result.groups = values

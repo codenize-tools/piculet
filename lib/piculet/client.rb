@@ -13,6 +13,30 @@ module Piculet
       AWS.memoize { walk(file) }
     end
 
+    def should_skip(sg_name, sg)
+      # Name
+      if @options.sg_names
+        if not @options.sg_names.include?(sg_name)
+          return true
+        end
+      end
+
+      if @options.exclude_sgs
+        if @options.exclude_sgs.any? {|regex| sg_name =~ regex}
+          return true
+        end
+      end
+
+      # Tag
+      if @options.exclude_tags
+        if sg and (@options.exclude_tags & sg.tags.keys).any?
+          return true
+        end
+      end
+
+      false
+    end
+
     def export(options = {})
       exported = AWS.memoize do
         Exporter.export(@options.ec2, @options_hash.merge(options))
@@ -97,16 +121,9 @@ module Piculet
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
-
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
-
         sg_aws = sg_list_aws[key]
+
+        next if should_skip(name, sg_aws)
 
         unless sg_aws
           sg_aws = collection_api.create(name, :vpc => vpc, :description => sg_dsl.description)
@@ -121,29 +138,17 @@ module Piculet
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
-
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
-
         sg_aws = sg_list_aws.delete(key)
+
+        next if should_skip(name, sg_aws)
+
         walk_security_group(sg_dsl, sg_aws)
       end
 
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
+        next if should_skip(name, sg_aws)
 
         sg_aws.ingress_ip_permissions.each {|i| i.delete }
         sg_aws.egress_ip_permissions.each {|i| i.delete } if vpc
@@ -152,13 +157,7 @@ module Piculet
       sg_list_aws.each do |key, sg_aws|
         name = key[0]
 
-        if @options.sg_names
-          next unless @options.sg_names.include?(name)
-        end
-
-        if @options.exclude_sgs
-          next if @options.exclude_sgs.any? {|regex| name =~ regex}
-        end
+        next if should_skip(name, sg_aws)
 
         sg_aws.delete
       end
