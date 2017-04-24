@@ -60,9 +60,25 @@ ARGV.options do |opt|
       }
     elsif profile_name or credentials_path
       credentials_opts = {}
-      credentials_opts[:profile_name] = profile_name if profile_name
-      credentials_opts[:path] = credentials_path if credentials_path
-      provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(credentials_opts)
+      if credentials_path
+        credentials_opts[:path] = credentials_path
+        AWSConfig.credentials_file = credentials_path
+      end
+      if profile_name
+        credentials_opts[:profile_name] = profile_name
+        role_arn = AWSConfig[profile_name][:role_arn]
+      end
+      if role_arn
+        session_name = "piculet-session-#{Time.now.to_i}"
+        sts = AWS::STS.new(AWSConfig[profile_name].config_hash)
+        provider = AWS::Core::CredentialProviders::AssumeRoleProvider.new(
+          sts: sts,
+          role_arn: role_arn,
+          role_session_name: session_name
+        )
+      else
+        provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(credentials_opts)
+      end
       aws_opts[:credential_provider] = provider
     elsif (access_key and !secret_key) or (!access_key and secret_key) or mode.nil?
       puts opt.help

@@ -10,6 +10,7 @@ require 'hashie'
 require 'ipaddr'
 
 require 'aws-sdk-v1'
+require 'aws_config'
 
 require 'piculet/ext/ec2-owner-id-ext'
 require 'piculet/ext/security-group'
