@@ -67,15 +67,15 @@ ARGV.options do |opt|
       if profile_name
         credentials_opts[:profile_name] = profile_name
         role_arn = AWSConfig[profile_name][:role_arn]
-      else
-        role_arn = AWSConfig.default.role_arn
-        profile_name = 'default'
       end
       if role_arn
-        AWSConfig[profile_name].config_hash
         session_name = "piculet-session-#{Time.now.to_i}"
         sts = AWS::STS.new(AWSConfig[profile_name].config_hash)
-        provider = AWS::Core::CredentialProviders::AssumeRoleProvider.new(sts: sts, role_arn: role_arn, role_session_name: session_name)
+        provider = AWS::Core::CredentialProviders::AssumeRoleProvider.new(
+          sts: sts,
+          role_arn: role_arn,
+          role_session_name: session_name
+        )
       else
         provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(credentials_opts)
       end
