@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "term-ansicolor", ">= 1.2.2"
   spec.add_dependency "diffy"
   spec.add_dependency "hashie"
+  spec.add_dependency "nokogiri", "~> 1.6.8"
 
   #spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
