@@ -52,6 +52,10 @@ ARGV.options do |opt|
     opt.on(''  , '--debug')                         {    options[:debug]              = true        }
     opt.parse!
 
+    credentials_path ||= ENV['AWS_CONFIG_FILE']
+    profile_name     ||= ENV['AWS_DEFAULT_PROFILE']
+    region           ||= ENV['AWS_DEFAULT_REGION']
+
     aws_opts = {}
     if access_key and secret_key
       aws_opts = {
