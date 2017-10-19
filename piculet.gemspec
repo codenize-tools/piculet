@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
   spec.files         = %w(README.md) + Dir.glob('bin/**/*') + Dir.glob('lib/**/*')
 
-  spec.add_dependency "aws-sdk-v1", ">= 1.48.0"
+  spec.add_dependency "aws-sdk", "~> 2.10"
   spec.add_dependency "term-ansicolor", ">= 1.2.2"
   spec.add_dependency "diffy"
   spec.add_dependency "hashie"

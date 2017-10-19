@@ -12,7 +12,7 @@ module Piculet
               @protocol_prot_range = protocol_prot_range
 
               @context = context.merge(
-                :protocol => protocol_prot_range[0],
+                :ip_protocol => protocol_prot_range[0],
                 :port_range => protocol_prot_range[1]
               )
 

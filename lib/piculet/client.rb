@@ -5,12 +5,12 @@ module Piculet
     def initialize(options = {})
       @options = OpenStruct.new(options)
       @options_hash = options
-      @options.ec2 = AWS::EC2.new
+      @options.ec2 = Aws::EC2::Resource.new
     end
 
     def apply(file)
       @options.ec2.owner_id
-      AWS.memoize { walk(file) }
+      walk(file)
     end
 
     def should_skip(sg_name, sg)
@@ -38,9 +38,7 @@ module Piculet
     end
 
     def export(options = {})
-      exported = AWS.memoize do
-        Exporter.export(@options.ec2, @options_hash.merge(options))
-      end
+      exported = Exporter.export(@options.ec2, @options_hash.merge(options))
 
       converter = proc do |src|
         if options[:without_convert]
@@ -116,8 +114,8 @@ module Piculet
     end
 
     def walk_ec2(vpc, ec2_dsl, ec2_aws, collection_api)
-      sg_list_dsl = collect_to_hash(ec2_dsl.security_groups, :name)
-      sg_list_aws = collect_to_hash(ec2_aws, :name)
+      sg_list_dsl = collect_to_hash(ec2_dsl.security_groups, :group_name)
+      sg_list_aws = collect_to_hash(ec2_aws, :group_name)
 
       sg_list_dsl.each do |key, sg_dsl|
         name = key[0]
@@ -180,8 +178,8 @@ module Piculet
     end
 
     def walk_permissions(permissions_dsl, permissions_aws)
-      perm_list_dsl = collect_to_hash(permissions_dsl, :protocol, :port_range)
-      perm_list_aws = collect_to_hash(permissions_aws, :protocol, :port_range)
+      perm_list_dsl = collect_to_hash(permissions_dsl, :ip_protocol, :port_range)
+      perm_list_aws = collect_to_hash(permissions_aws, :ip_protocol, :port_range)
 
       perm_list_aws.each do |key, perm_aws|
         perm_dsl = perm_list_dsl.delete(key)

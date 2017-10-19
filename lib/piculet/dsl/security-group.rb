@@ -10,7 +10,7 @@ module Piculet
           @context = context.merge(:security_group_name => name)
 
           @result = OpenStruct.new({
-            :name    => name,
+            :group_name => name,
             :tags    => {},
             :ingress => [],
             :egress  => [],

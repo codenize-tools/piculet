@@ -18,9 +18,10 @@ module Piculet
         log(:info, 'Create SecurityGroup', :cyan, "#{opts[:vpc] || :classic} > #{name}")
 
         if @options.dry_run
-          sg = OpenStruct.new({:id => '<new security group>', :name => name, :vpc_id => opts[:vpc], :tags => {}}.merge(opts))
+          sg = OpenStruct.new({:id => '<new security group>', :group_name => name, :vpc_id => opts[:vpc], :tags => {}}.merge(opts))
         else
-          sg = @security_groups.create(name, opts)
+          args = { :group_name => name, :vpc_id => opts[:vpc], :description => opts[:description] }
+          sg = @options.ec2.create_security_group(args)
           @options.updated = true
         end
 
