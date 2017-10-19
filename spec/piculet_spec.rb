@@ -9,7 +9,7 @@ end # ec2
 EOS
     }
 
-    @ec2 = AWS::EC2.new
+    @ec2 = Aws::EC2::Resource.new
   }
 
   after(:all) do
