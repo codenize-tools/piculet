@@ -42,7 +42,7 @@ module Aws
 
         DESC_OWNER_ID_RETRY_TIMES.times do
           name = random_security_group_name
-          security_group = self.security_groups.create(name) rescue nil
+          security_group = self.create_security_group(group_name: name, description: name) rescue nil
           break if security_group
           sleep DESC_OWNER_ID_RETRY_WAIT
         end
