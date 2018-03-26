@@ -58,11 +58,11 @@ module Piculet
           :port_range => port_range,
           :ip_ranges  => ip_ranges,
           :groups => ip_perm.user_id_group_pairs.map {|group|
-            group = @ec2.security_groups.find { |g| g.id == group.group_id }
+            g = @ec2.security_group(group.group_id)
             {
-              :id       => group.group_id,
-              :name     => group.group_name,
-              :owner_id => group.owner_id,
+              :id       => g.group_id,
+              :name     => g.group_name,
+              :owner_id => g.owner_id,
             }
           }.sort_by {|g| g[:name] },
         }
