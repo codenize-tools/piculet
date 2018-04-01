@@ -53,7 +53,7 @@ ARGV.options do |opt|
     opt.parse!
 
     credentials_path ||= ENV['AWS_CONFIG_FILE']
-    profile_name     ||= ENV['AWS_DEFAULT_PROFILE']
+    profile_name     ||= ENV['AWS_DEFAULT_PROFILE'] || ENV['AWS_PROFILE']
     region           ||= ENV['AWS_DEFAULT_REGION']
 
     aws_opts = {}
