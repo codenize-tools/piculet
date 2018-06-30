@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "term-ansicolor", ">= 1.2.2"
   spec.add_dependency "diffy"
   spec.add_dependency "hashie"
-  spec.add_dependency "nokogiri", "~> 1.6.8"
+  spec.add_dependency "nokogiri", "~> 1.8.2"
   spec.add_dependency "aws_config", "0.1.0"
 
   #spec.files         = `git ls-files`.split($/)
