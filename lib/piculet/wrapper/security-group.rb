@@ -7,7 +7,7 @@ module Piculet
 
         def_delegators(
           :@security_group,
-          :vpc_id, :name, :vpc?)
+          :vpc_id, :name)
 
         def initialize(security_group, options)
           @security_group = security_group
@@ -40,6 +40,10 @@ module Piculet
               @options.updated = true
             end
           end
+        end
+
+        def vpc?
+          !!@security_group
         end
 
         def tags
