@@ -116,8 +116,8 @@ end
           name_or_id = i[:name] || i[:id]
           owner_id = i[:owner_id]
 
-          if AWS::EC2::SecurityGroup.elb?(owner_id)
-            arg = AWS::EC2::SecurityGroup.elb_sg
+          if Aws::EC2::SecurityGroup.elb?(owner_id)
+            arg = Aws::EC2::SecurityGroup.elb_sg
           elsif @owner_id == owner_id
             arg = name_or_id
           else

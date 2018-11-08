@@ -7,7 +7,11 @@ module Piculet
 
         def_delegators(
           :@security_group,
-          :vpc_id, :name)
+# <<<<<<< HEAD
+#           :vpc_id, :name)
+# =======
+          :vpc_id, :group_name)
+#>>>>>>> Upgrade aws-sdk to v2
 
         def initialize(security_group, options)
           @security_group = security_group
@@ -20,19 +24,19 @@ module Piculet
 
         def update(dsl)
           unless description_eql?(dsl)
-            log(:warn, '`description` cannot be updated', :yellow, "#{vpc_id || :classic} > #{name}")
+            log(:warn, '`description` cannot be updated', :yellow, "#{vpc_id || :classic} > #{group_name}")
           end
 
           unless tags_eql?(dsl)
-            log(:info, 'Update SecurityGroup', :green, "#{vpc_id || :classic} > #{name}")
+            log(:info, 'Update SecurityGroup', :green, "#{vpc_id || :classic} > #{group_name}")
             update_tags(dsl)
           end
         end
 
         def delete
-          log(:info, 'Delete SecurityGroup', :red, "#{vpc_id || :classic} > #{name}")
+          log(:info, 'Delete SecurityGroup', :red, "#{vpc_id || :classic} > #{group_name}")
 
-          if name == 'default'
+          if group_name == 'default'
             log(:warn, 'SecurityGroup `default` is reserved', :yellow)
           else
             unless @options.dry_run
@@ -48,7 +52,7 @@ module Piculet
 
         def tags
           h = {}
-          @security_group.tags.map {|k, v| h[k] = v }
+          @security_group.tags.map {|tag| h[tag.key] = tag.value }
           h
         end
 
@@ -78,23 +82,18 @@ module Piculet
           log(:info, "  tags:\n".green + Piculet::Utils.diff(self_tags, dsl_tags, :color => @options.color, :indent => '    '), false)
 
           unless @options.dry_run
-            if dsl_tags.empty?
-              @security_group.tags.clear
-            else
-              delete_keys = self_tags.keys - dsl_tags.keys
-              # XXX: `delete` method does not remove the tag. It's seems a bug in the API
-              #@security_group.tags.delete(delete_keys) unless delete_keys.empty?
-              @security_group.tags.clear unless delete_keys.empty?
-              @security_group.tags.set(dsl_tags)
-            end
+            client = @security_group.client
+            id = @security_group.id
+            client.delete_tags(resources: [ id ], tags: [])
+            client.create_tags(resources: [ id ], tags: dsl_tags)
 
             @options.updated = true
           end
         end
 
         def normalize_tags(src)
-          normalized = {}
-          src.map {|k, v| normalized[k.to_s] = v.to_s }
+          normalized = []
+          src.map {|k, v| normalized << { key: k.to_s, value: v.to_s } }
           normalized
         end
       end # SecurityGroup

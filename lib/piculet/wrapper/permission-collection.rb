@@ -7,13 +7,18 @@ module Piculet
 
           def initialize(security_group, direction, options)
             @security_group = security_group
-            @permissions = security_group.send("#{direction}_ip_permissions")
+            case direction
+            when :ingress
+              @permissions = security_group.ip_permissions
+            when :egress
+              @permissions = security_group.ip_permissions_egress
+            end
             @direction = direction
             @options = options
           end
 
           def each
-            perm_list = @permissions ? @permissions.aggregate : []
+            perm_list = @permissions || []
 
             perm_list.each do |perm|
               yield(Permission.new(perm, self, @options))
@@ -28,11 +33,13 @@ module Piculet
 
               case @direction
               when :ingress
-                @security_group.authorize_ingress(protocol, ports, *sources)
+                params = permission_params(protocol, ports, sources)
+                @security_group.authorize_ingress(params)
                 @options.updated = true
               when :egress
                 sources.push(:protocol => protocol, :ports => ports)
-                @security_group.authorize_egress(*sources)
+                params = permission_params(protocol, ports, sources)
+                @security_group.authorize_egress(params)
                 @options.updated = true
               end
             end
@@ -46,11 +53,13 @@ module Piculet
 
               case @direction
               when :ingress
-                @security_group.revoke_ingress(protocol, ports, *sources)
+                params = permission_params(protocol, ports, sources)
+                @security_group.revoke_ingress(params)
                 @options.updated = true
               when :egress
                 sources.push(:protocol => protocol, :ports => ports)
-                @security_group.revoke_egress(*sources)
+                params = permission_params(protocol, ports, sources)
+                @security_group.revoke_egress(params)
                 @options.updated = true
               end
             end
@@ -72,7 +81,7 @@ module Piculet
 
           def log_id
             vpc = @security_group.vpc_id || :classic
-            name = @security_group.name
+            name = @security_group.group_name
 
             if @security_group.owner_id and not @options.ec2.own?(@security_group.owner_id)
               name = "#{@security_group.owner_id}/#{name}"
@@ -92,19 +101,19 @@ module Piculet
               when Array
                 owner_id, group = src
 
-                if src.any? {|i| AWS::EC2::SecurityGroup.elb?(i) }
+                if src.any? {|i| Aws::EC2::SecurityGroup.elb?(i) }
                   normalized << {
-                    :user_id    => AWS::EC2::SecurityGroup::ELB_OWNER,
-                    :group_name => AWS::EC2::SecurityGroup::ELB_NAME
+                    :user_id    => Aws::EC2::SecurityGroup::ELB_OWNER,
+                    :group_name => Aws::EC2::SecurityGroup::ELB_NAME
                   }
                 else
                   unless group =~ /\Asg-[0-9a-f]+\Z/
-                    sg_coll = @options.ec2.security_groups.filter('group-name', group)
+                    sg_coll = @options.ec2.security_groups.select { |sg| sg.group_name == group }
 
                     if @options.ec2.own?(owner_id)
-                      sg_coll = sg_coll.filter('vpc-id', @security_group.vpc_id) if @security_group.vpc?
+                      sg_coll = sg_coll.select { |sg| sg.vpc_id == @security_group.vpc_id } if @security_group.vpc?
                     else
-                      sg_coll = sg_coll.filter('owner-id', owner_id)
+                      sg_coll = sg_coll.select { |sg| sg.owner_id == @security_group.owner_id }
                     end
 
                     unless (sg = sg_coll.first)
@@ -133,6 +142,28 @@ module Piculet
                 src
               end
             }.join(', ')
+          end
+
+          def permission_params(protocol, ports, sources)
+            ip_protocol = protocol == :any ? "-1" : protocol.to_sym
+            ports = ports || (-1..-1)
+
+            ip_permissions = []
+            sources.each do |source|
+              permission = { ip_protocol: ip_protocol, from_port: ports.begin, to_port: ports.end }
+              if valid_ip?(source)
+                permission.merge!({ ip_ranges: [ { cidr_ip: source } ] })
+              else
+                permission.merge!({ user_id_group_pairs: [ { group_id: source[:group_id] } ] })
+              end
+              ip_permissions << Aws::EC2::Types::IpPermission.new(permission)
+            end
+
+            { ip_permissions: ip_permissions }
+          end
+
+          def valid_ip?(str)
+            !!IPAddr.new(str) rescue false
           end
         end # PermissionCollection
       end # SecurityGroup
