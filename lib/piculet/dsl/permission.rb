@@ -21,7 +21,7 @@ module Piculet
             end
 
             def result
-              unless @result.ip_ranges or @result.groups
+              unless @result.ip_ranges or @result.ipv_6_ranges or @result.groups
                 raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges` or `groups` is required"
               end
 
@@ -34,16 +34,20 @@ module Piculet
                 raise ArgumentError, "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: wrong number of arguments (0 for 1..)"
               end
 
+              ipv_4_ranges = []
+              ipv_6_ranges = []
+
               values.each do |ip_range|
-                unless ip_range =~ %r|\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}|
-                  raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range}"
-                end
+
+                # unless ip_range =~ %r|\d{1,3}\.\d{1,3}\.\d{1,3}/\d{1,2}|
+                #   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range}"
+                # end
 
                 ip, range = ip_range.split('/', 2)
 
-                unless ip.split('.').all? {|i| (0..255).include?(i.to_i) } and (0..32).include?(range.to_i)
-                  raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range}"
-                end
+                # unless ip.split('.').all? {|i| (0..255).include?(i.to_i) } and (0..32).include?(range.to_i)
+                #   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range}"
+                # end
 
                 begin
                   parsed_ipaddr = IPAddr.new(ip_range)
@@ -51,16 +55,28 @@ module Piculet
                   if ip != parsed_ipaddr.to_s
                     raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range} correct #{parsed_ipaddr.to_s}/#{range}"
                   end
+
+                  if parsed_ipaddr.ipv4?
+                    ipv_4_ranges << ip_range
+                  else
+                    ipv_6_ranges << ip_range
+                  end
+
                 rescue => e
                   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: #{ip_range}: #{e.message}"
                 end
               end
 
-              if values.size != values.uniq.size
+              if ipv_4_ranges.size != ipv_4_ranges.uniq.size
                 raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: duplicate ip ranges"
               end
 
-              @result.ip_ranges = values
+              if ipv_6_ranges.size != ipv_6_ranges.uniq.size
+                raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `ipv_6_ranges`: duplicate ipv6 ranges"
+              end
+
+              @result.ip_ranges = ipv_4_ranges
+              @result.ipv_6_ranges = ipv_6_ranges
             end
 
             def groups(*values)

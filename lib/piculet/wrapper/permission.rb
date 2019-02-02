@@ -22,8 +22,15 @@ module Piculet
             end
 
             def eql?(dsl)
-              dsl_ip_ranges, dsl_groups, self_ip_ranges, self_groups = normalize_attrs(dsl)
-              (self_ip_ranges == dsl_ip_ranges) and (self_groups == dsl_groups)
+              dsl_ip_ranges, dsl_ipv_6_ranges, dsl_groups, self_ip_ranges, self_ipv_6_ranges, self_groups = normalize_attrs(dsl)
+              if self_ipv_6_ranges == dsl_ipv_6_ranges
+
+              else
+                puts dsl
+                puts self_ipv_6_ranges
+                puts "NG"
+              end
+              (self_ip_ranges == dsl_ip_ranges) and (self_ipv_6_ranges == dsl_ipv_6_ranges) and (self_groups == dsl_groups)
             end
 
             def update(dsl)
@@ -76,6 +83,7 @@ module Piculet
 
             def normalize_attrs(dsl)
               dsl_ip_ranges = (dsl.ip_ranges || []).sort
+              dsl_ipv_6_ranges = (dsl.ipv_6_ranges || []).sort
               dsl_groups = (dsl.groups || []).map {|i|
                 if i.kind_of?(Array)
                   i
@@ -86,13 +94,14 @@ module Piculet
                 end
               }.sort
 
-              self_ip_ranges, self_groups = normalize_self_attrs(dsl_groups.map { |g| g[1] })
+              self_ip_ranges, self_ipv_6_ranges, self_groups = normalize_self_attrs(dsl_groups.map { |g| g[1] })
 
-              [dsl_ip_ranges, dsl_groups, self_ip_ranges, self_groups]
+              [dsl_ip_ranges, dsl_ipv_6_ranges, dsl_groups, self_ip_ranges, self_ipv_6_ranges, self_groups]
             end
 
             def normalize_self_attrs(dsl_group_names)
               self_ip_ranges = @permission.ip_ranges.map { |range| range.cidr_ip }.sort
+              self_ipv_6_ranges = @permission.ipv_6_ranges.map { |range| range.cidr_ipv_6 }.sort
               self_groups = (@permission.user_id_group_pairs || []).map {|i|
                 if dsl_group_names.include?(i.group_id)
                   [i.user_id, i.group_id]
@@ -102,7 +111,7 @@ module Piculet
                 end
               }.sort
 
-              [self_ip_ranges, self_groups]
+              [self_ip_ranges, self_ipv_6_ranges, self_groups]
             end
           end # Permission
         end # PermissionCollection

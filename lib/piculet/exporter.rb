@@ -53,6 +53,7 @@ module Piculet
         port_range = ip_perm.from_port..ip_perm.to_port
         port_range = nil if port_range == (nil..nil)
         ip_ranges = ip_perm.ip_ranges.map { |range| range.cidr_ip }.sort
+        ip_ranges.concat(ip_perm.ipv_6_ranges.map { |range| range.cidr_ipv_6 }.sort)
         {
           :protocol   => ip_protocol,
           :port_range => port_range,

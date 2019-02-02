@@ -152,7 +152,11 @@ module Piculet
             sources.each do |source|
               permission = { ip_protocol: ip_protocol, from_port: ports.begin, to_port: ports.end }
               if valid_ip?(source)
-                permission.merge!({ ip_ranges: [ { cidr_ip: source } ] })
+                if ipv4?(source)
+                  permission.merge!({ ip_ranges: [ { cidr_ip: source } ] })
+                else
+                  permission.merge!({ ipv_6_ranges: [ { cidr_ipv_6: source } ] })
+                end
               else
                 permission.merge!({ user_id_group_pairs: [ { group_id: source[:group_id] } ] })
               end
@@ -164,6 +168,10 @@ module Piculet
 
           def valid_ip?(str)
             !!IPAddr.new(str) rescue false
+          end
+
+          def ipv4?(str)
+            IPAddr.new(str).ipv4?
           end
         end # PermissionCollection
       end # SecurityGroup
