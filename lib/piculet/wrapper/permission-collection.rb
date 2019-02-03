@@ -67,11 +67,12 @@ module Piculet
 
           def create(protocol, port_range, dsl)
             dsl_ip_ranges = dsl.ip_ranges || []
+            dsl_ipv_6_ranges = dsl.ipv_6_ranges || []
             dsl_groups = (dsl.groups || []).map do |i|
               i.kind_of?(Array) ? i : [@options.ec2.owner_id, i]
             end
 
-            sources = dsl_ip_ranges + dsl_groups
+            sources = dsl_ip_ranges + dsl_ipv_6_ranges + dsl_groups
 
             unless sources.empty?
               log(:info, 'Create Permission', :cyan, "#{log_id} > #{protocol} #{port_range}")

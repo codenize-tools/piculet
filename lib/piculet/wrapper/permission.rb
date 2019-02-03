@@ -23,37 +23,31 @@ module Piculet
 
             def eql?(dsl)
               dsl_ip_ranges, dsl_ipv_6_ranges, dsl_groups, self_ip_ranges, self_ipv_6_ranges, self_groups = normalize_attrs(dsl)
-              if self_ipv_6_ranges == dsl_ipv_6_ranges
 
-              else
-                puts dsl
-                puts self_ipv_6_ranges
-                puts "NG"
-              end
               (self_ip_ranges == dsl_ip_ranges) and (self_ipv_6_ranges == dsl_ipv_6_ranges) and (self_groups == dsl_groups)
             end
 
             def update(dsl)
               log(:info, 'Update Permission', :green, log_id)
 
-              plus_ip_ranges, minus_ip_ranges, plus_groups, minus_groups = diff(dsl)
+              plus_ip_ranges, minus_ip_ranges, plus_ipv_6_ranges, minus_ipv_6_ranges, plus_groups, minus_groups = diff(dsl)
 
-              unless (plus_ip_ranges + plus_groups).empty?
-                @collection.authorize(ip_protocol, port_range, (plus_ip_ranges + plus_groups), :log_color => :green)
+              unless (plus_ip_ranges + plus_ipv_6_ranges + plus_groups).empty?
+                @collection.authorize(ip_protocol, port_range, (plus_ip_ranges + plus_ipv_6_ranges + plus_groups), :log_color => :green)
               end
 
-              unless (minus_ip_ranges + minus_groups).empty?
-                @collection.revoke(ip_protocol, port_range, (minus_ip_ranges + minus_groups), :log_color => :green)
+              unless (minus_ip_ranges + minus_ipv_6_ranges + minus_groups).empty?
+                @collection.revoke(ip_protocol, port_range, (minus_ip_ranges + minus_ipv_6_ranges + minus_groups), :log_color => :green)
               end
             end
 
             def delete
               log(:info, 'Delete Permission', :red, log_id)
 
-              self_ip_ranges, self_groups = normalize_self_attrs([])
+              self_ip_ranges, self_ipv_6_ranges, self_groups = normalize_self_attrs([])
 
-              unless (self_ip_ranges + self_groups).empty?
-                @collection.revoke(ip_protocol, port_range, (self_ip_ranges + self_groups), :log_color => :red)
+              unless (self_ip_ranges + self_ipv_6_ranges + self_groups).empty?
+                @collection.revoke(ip_protocol, port_range, (self_ip_ranges + self_ipv_6_ranges + self_groups), :log_color => :red)
               end
             end
 
@@ -71,11 +65,13 @@ module Piculet
             end
 
             def diff(dsl)
-              dsl_ip_ranges, dsl_groups, self_ip_ranges, self_groups = normalize_attrs(dsl)
+              dsl_ip_ranges, dsl_ipv_6_ranges, dsl_groups, self_ip_ranges, self_ipv_6_ranges, self_groups = normalize_attrs(dsl)
 
               [
                 dsl_ip_ranges - self_ip_ranges,
                 self_ip_ranges - dsl_ip_ranges,
+                dsl_ipv_6_ranges - self_ipv_6_ranges,
+                self_ipv_6_ranges - dsl_ipv_6_ranges,
                 dsl_groups - self_groups,
                 self_groups - dsl_groups,
               ]
