@@ -2,6 +2,7 @@ module Piculet
   class DSL
     class EC2
       class SecurityGroup
+        include Logger::ClientHelper
         include Piculet::TemplateHelper
 
         def initialize(context, name, vpc, &block)
@@ -10,7 +11,7 @@ module Piculet
           @context = context.merge(:security_group_name => name)
 
           @result = OpenStruct.new({
-            :name    => name,
+            :group_name => name,
             :tags    => {},
             :ingress => [],
             :egress  => [],
@@ -51,6 +52,15 @@ module Piculet
           end
 
           @result.ingress = Permissions.new(@context, @name, :ingress, &block).result
+          rule_cnt = @result.ingress.reduce(0) {
+            |sum , o|
+            sum +
+              (o.ip_ranges.nil? ? 0 : o.ip_ranges.length()) +
+              (o.groups.nil? ? 0 : o.groups.length())
+          }
+          if rule_cnt > (ENV['PICULET_WN'].to_i > 0 ? ENV['PICULET_WN'].to_i : 50)
+            log(:warn, "`#{@vpc}.#{@name}`: ingress too many #{rule_cnt} " , :yellow)
+          end
           @ingress_is_defined = true
         end
 
@@ -64,7 +74,15 @@ module Piculet
           end
 
           @result.egress = Permissions.new(@context, @name, :egress, &block).result
-
+          rule_cnt = @result.egress.reduce(0) {
+            |sum , o|
+            sum +
+              (o.ip_ranges.nil? ? 0 : o.ip_ranges.length()) +
+              (o.groups.nil? ? 0 : o.groups.length())
+          }
+          if rule_cnt > (ENV['PICULET_WN'].to_i > 0 ? ENV['PICULET_WN'].to_i : 50)
+            log(:warn, "`#{@vpc}.#{@name}`: egress too many #{rule_cnt} " , :yellow)
+          end
           @egress_is_defined = true
         end
       end # SecurityGroup

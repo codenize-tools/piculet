@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'aws-sdk-v1'
+require 'aws-sdk'
 require 'piculet'
 
 TEST_VPC_ID = ENV['TEST_VPC_ID']
@@ -7,7 +7,7 @@ TEST_OWNER_ID = ENV['TEST_OWNER_ID']
 RETRY_TIMES = 10
 EMPTY_ARRAY = []
 
-AWS.config({
+Aws.config.update({
   :access_key_id => (ENV['TEST_AWS_ACCESS_KEY_ID'] || 'scott'),
   :secret_access_key => (ENV['TEST_AWS_SECRET_ACCESS_KEY'] || 'tiger'),
   :region => ENV['TEST_AWS_REGION'],
@@ -25,7 +25,7 @@ def groupfile(options = {})
     }.merge(options)
 
     if options[:debug]
-      AWS.config({
+      Aws.config.update({
         :http_wire_trace => true,
         :logger => (options[:logger] || Piculet::Logger.instance),
       })
@@ -37,7 +37,7 @@ def groupfile(options = {})
       begin
         updated = client.apply(tempfile)
         break
-      rescue AWS::EC2::Errors::InvalidGroup::NotFound => e
+      rescue Aws::EC2::Errors::InvalidGroupNotFound => e
         raise e unless i < RETRY_TIMES
       end
     end
@@ -55,7 +55,7 @@ def export_security_groups(options = {})
   }.merge(options)
 
   if options[:debug]
-    AWS.config({
+    Aws.config.update({
       :http_wire_trace => true,
       :logger => (options[:logger] || Piculet::Logger.instance),
     })

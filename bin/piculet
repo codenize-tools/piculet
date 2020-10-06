@@ -74,23 +74,23 @@ ARGV.options do |opt|
       end
       if role_arn
         session_name = "piculet-session-#{Time.now.to_i}"
-        sts = AWS::STS.new(AWSConfig[profile_name].config_hash)
-        provider = AWS::Core::CredentialProviders::AssumeRoleProvider.new(
-          sts: sts,
+        client = Aws::STS::Client.new(AWSConfig[profile_name].config_hash)
+        provider = Aws::AssumeRoleCredentials.new(
+          client: client,
           role_arn: role_arn,
           role_session_name: session_name
         )
       else
-        provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(credentials_opts)
+        provider = Aws::SharedCredentials.new(credentials_opts)
       end
-      aws_opts[:credential_provider] = provider
+      aws_opts[:credentials] = provider
     elsif (access_key and !secret_key) or (!access_key and secret_key) or mode.nil?
       puts opt.help
       exit 1
     end
 
     aws_opts[:region] = region if region
-    AWS.config(aws_opts)
+    Aws.config.update(aws_opts)
 
     # Remap groups to exclude to regular expressions (if they're surrounded by '/')
     if options[:exclude_sgs]
@@ -111,7 +111,7 @@ end
 String.colorize = options[:color]
 
 if options[:debug]
-  AWS.config({
+  Aws.config.update({
     :http_wire_trace => true,
     :logger => Piculet::Logger.instance,
   })

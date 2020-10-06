@@ -9,7 +9,7 @@ end # ec2
 RUBY
     }
 
-    @ec2 = AWS::EC2.new
+    @ec2 = Aws::EC2::Resource.new
   }
 
   after(:all) do

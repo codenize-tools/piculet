@@ -1,5 +1,5 @@
-module AWS
-  class EC2
+module Aws
+  module EC2
     class SecurityGroup
       ELB_OWNER = 'amazon-elb'
       ELB_NAME = 'amazon-elb-sg'
@@ -8,11 +8,15 @@ module AWS
         self.class.elb?(self.owner_id)
       end
 
-      alias name_orig name
+      def vpc?
+        vpc_id ? true : false
+      end
 
-      def name
-        self.elb? ? ELB_NAME : name_orig
-      rescue AWS::EC2::Errors::InvalidGroup::NotFound
+      alias group_name_orig group_name
+
+      def group_name
+        self.elb? ? ELB_NAME : group_name_orig
+      rescue Aws::EC2::Errors::InvalidGroupNotFound
         self.id
       end
 
@@ -27,4 +31,4 @@ module AWS
       end # of class methods
     end # SecurityGroup
   end # EC2
-end # AWS
+end # Aws

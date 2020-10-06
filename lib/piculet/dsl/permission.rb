@@ -15,7 +15,7 @@ module Piculet
               @protocol_prot_range = protocol_prot_range
 
               @context = context.merge(
-                :protocol => protocol_prot_range[0],
+                :ip_protocol => protocol_prot_range[0],
                 :port_range => protocol_prot_range[1]
               )
 
@@ -24,7 +24,7 @@ module Piculet
             end
 
             def result
-              unless @result.ip_ranges or @result.groups
+              unless @result.ip_ranges or @result.ipv_6_ranges or @result.groups
                 raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges` or `groups` is required"
               end
 
@@ -36,6 +36,9 @@ module Piculet
               if values.empty?
                 raise ArgumentError, "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: wrong number of arguments (0 for 1..)"
               end
+
+              ipv_4_ranges = []
+              ipv_6_ranges = []
 
               values.each do |ip_range|
                 unless ip_range =~ IPv4_CIDR or ip_range =~ IPV6_CIDR
@@ -50,16 +53,28 @@ module Piculet
                   if ip != parsed_ipaddr.to_s
                     raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: invalid ip range: #{ip_range} correct #{parsed_ipaddr.to_s}/#{range}"
                   end
+
+                  if parsed_ipaddr.ipv4?
+                    ipv_4_ranges << ip_range
+                  else
+                    ipv_6_ranges << ip_range
+                  end
+
                 rescue => e
                   raise "SecurityGroup `#{@security_group}`: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: #{ip_range}: #{e.message}"
                 end
               end
 
-              if values.size != values.uniq.size
+              if ipv_4_ranges.size != ipv_4_ranges.uniq.size
                 raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `ip_ranges`: duplicate ip ranges"
               end
 
-              @result.ip_ranges = values
+              if ipv_6_ranges.size != ipv_6_ranges.uniq.size
+                raise "SecurityGroup `#{@security_group}\: #{@direction}: #{@protocol_prot_range}: `ipv_6_ranges`: duplicate ipv6 ranges"
+              end
+
+              @result.ip_ranges = ipv_4_ranges
+              @result.ipv_6_ranges = ipv_6_ranges
             end
 
             def groups(*values)

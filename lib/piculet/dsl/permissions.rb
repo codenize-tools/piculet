@@ -19,9 +19,10 @@ module Piculet
               protocol, port_range = key
 
               OpenStruct.new({
-                :protocol   => protocol,
+                :ip_protocol => protocol,
                 :port_range => port_range,
                 :ip_ranges  => perm.ip_ranges,
+                :ipv_6_ranges => perm.ipv_6_ranges,
                 :groups     => perm.groups,
               })
             end
