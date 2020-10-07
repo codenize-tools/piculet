@@ -9,12 +9,11 @@ require 'pp'
 require 'hashie'
 require 'ipaddr'
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 require 'aws_config'
 
 require 'piculet/ext/ec2-owner-id-ext'
 require 'piculet/ext/security-group'
-require 'piculet/ext/ip-permission-collection-ext'
 require 'piculet/ext/string-ext'
 
 require 'piculet/logger'
